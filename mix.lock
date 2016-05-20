@@ -1,0 +1,9 @@
+%{"base32": {:git, "https://github.com/aetrion/base32_erlang.git", "40431a7480176b24863e18b92d9872e54c714df5", [ref: "master"]},
+  "bear": {:hex, :bear, "0.8.3", "866002127a97932720a0d475d8582c98ec5fb78db3a18dfe7eaf91594d9024b8", [:rebar3], []},
+  "dns_erlang": {:git, "https://github.com/aetrion/dns_erlang.git", "674603aec44a2f3fda1f42dd93d1c1368ac319ca", []},
+  "exjsx": {:hex, :exjsx, "3.2.0", "7136cc739ace295fc74c378f33699e5145bead4fdc1b4799822d0287489136fb", [:mix], [{:jsx, "~> 2.6.2", [hex: :jsx, optional: false]}]},
+  "folsom": {:hex, :folsom, "0.8.3", "71cff146152fa95e6092e62119f9dc96888660111e7b61853c8fdcf80598a4e0", [:rebar3], [{:bear, "0.8.3", [hex: :bear, optional: false]}]},
+  "goldrush": {:git, "git://github.com/DeadZen/goldrush.git", "212299233c7e7eb63a97be2777e1c05ebaa58dbe", [tag: "0.1.8"]},
+  "jsx": {:hex, :jsx, "2.6.2", "213721e058da0587a4bce3cc8a00ff6684ced229c8f9223245c6ff2c88fbaa5a", [:mix, :rebar], []},
+  "lager": {:git, "https://github.com/basho/lager.git", "45fe95ba6cd964b7a667394c4e671a5afe8f5a42", []},
+  "meck": {:git, "git://github.com/eproxus/meck", "dde759050eff19a1a80fd854d7375174b191665d", [tag: "0.8.2"]}}
