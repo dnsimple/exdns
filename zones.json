@@ -39,6 +39,14 @@
                 "data": {
                     "ip": "1.2.3.4"
                 }
+            },
+            {
+                "name": "www.example.com",
+                "type": "CNAME",
+                "ttl": 3600,
+                "data": {
+                    "dname": "somesite.com"
+                }
             }
         ]
     }

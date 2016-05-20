@@ -70,7 +70,11 @@ defmodule Exdns.ZoneParser do
       {:ok, address} -> Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_a, data: Exdns.Records.dns_rrdata_a(ip: address), ttl: ttl)
       {:error, reason} -> Logger.error("Failed to parse A record address #{raw_ip}: #{reason}")
     end
-   
+  end
+
+  def json_record_to_rr(%{"name" => name, "type" => "CNAME", "ttl" => ttl, "data" => data}) do
+    rrdata = Exdns.Records.dns_rrdata_cname(dname: data["dname"])
+    Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_cname, data: rrdata, ttl: ttl)
   end
 
   def json_record_to_rr(%{"name" => name, "type" => "NS", "ttl" => ttl, "data" => data}) do

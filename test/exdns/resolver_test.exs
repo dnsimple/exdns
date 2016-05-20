@@ -9,10 +9,19 @@ defmodule Exdns.ResolverTest do
     assert Exdns.Resolver.resolve(message, :authority, :host) == message
   end
 
-  test "resolve with one question" do
+  test "resolve with one question for type A" do
     {:ok, zone} = Exdns.ZoneCache.get_zone("example.com")
     assert zone.authority != :undefined
     question = Exdns.Records.dns_query(name: "example.com", type: :dns_terms_const.dns_type_a)
+    message = Exdns.Records.dns_message(questions: [question])
+    answer = Exdns.Resolver.resolve(message, [zone.authority], :host)
+    assert length(Exdns.Records.dns_message(answer, :answers)) > 0
+  end
+
+  test "resolve with one question for type CNAME" do
+    {:ok, zone} = Exdns.ZoneCache.get_zone("example.com")
+    assert zone.authority != :undefined
+    question = Exdns.Records.dns_query(name: "www.example.com", type: :dns_terms_const.dns_type_cname)
     message = Exdns.Records.dns_message(questions: [question])
     answer = Exdns.Resolver.resolve(message, [zone.authority], :host)
     assert length(Exdns.Records.dns_message(answer, :answers)) > 0

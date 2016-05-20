@@ -205,7 +205,8 @@ defmodule Exdns.Resolver do
     cname_type = :dns_terms_const.dns_type_cname
     case qtype do
       ^cname_type ->
-        Exdns.Records.dns_message(message, aa: true, answers: Exdns.Records.dns_message(message, :answers) ++ cname_records)
+        Logger.debug("Qtype is CNAME, returning the CNAME records: #{inspect cname_records}")
+        Exdns.Records.dns_message(message, aa: true, answers: merge_with_answers(message, cname_records))
       _ ->
         if Enum.include?(cname_chain, List.last(cname_records)) do
           Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_servfail) # CNAME loop
@@ -214,7 +215,6 @@ defmodule Exdns.Resolver do
           restart_query(Exdns.Records.dns_message(message, aa: true, answers: Exdns.Records.dns_message(message, :answers) ++ cname_records), name, qtype, host, cname_chain ++ cname_records, zone, Exdns.ZoneCache.in_zone?(name))
         end
     end
-    message
   end
 
 
