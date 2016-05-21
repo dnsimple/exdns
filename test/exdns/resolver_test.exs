@@ -36,6 +36,7 @@ defmodule Exdns.ResolverTest do
     assert length(Exdns.Records.dns_message(answer, :answers)) > 0
   end
 
+  # Step 3 tests
   test "test resolve when not authoritative" do
     question = Exdns.Records.dns_query(name: "notfound.com", type: :dns_terms_const.dns_type_a)
     message = Exdns.Records.dns_message(questions: [question])

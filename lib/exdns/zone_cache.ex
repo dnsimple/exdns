@@ -85,6 +85,14 @@ defmodule Exdns.ZoneCache do
   end
 
 
+  def in_zone?(name) do
+    case find_zone_in_cache(name) do
+      {:ok, zone} -> is_name_in_zone(name, zone)
+      _ -> false
+    end
+  end
+
+
   def put_zone(name, zone) do
     Exdns.Storage.insert(:zones, {normalize_name(name), zone})
     :ok
@@ -100,6 +108,18 @@ defmodule Exdns.ZoneCache do
   end
 
   # Internal API
+
+  def is_name_in_zone(name, zone) do
+    if Map.has_key?(zone.records_by_name, normalize_name(name)) do
+      true
+    else
+      case :dns.dname_to_labels(name) do
+        [] -> false
+        [_] -> false
+        [_|labels] -> is_name_in_zone(:dns.labels_to_dname(labels), zone)
+      end
+    end
+  end
 
   def find_zone_in_cache(name) do
     find_zone_in_cache(normalize_name(name), :dns.dname_to_labels(name))

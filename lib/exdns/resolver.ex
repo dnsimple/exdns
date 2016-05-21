@@ -48,6 +48,7 @@ defmodule Exdns.Resolver do
     end
   end
 
+  # Resolution logic
 
   def best_match_resolution(message, qname, qtype, host, cname_chain, matched_records, zone) do
     message
@@ -208,7 +209,7 @@ defmodule Exdns.Resolver do
         Logger.debug("Qtype is CNAME, returning the CNAME records: #{inspect cname_records}")
         Exdns.Records.dns_message(message, aa: true, answers: merge_with_answers(message, cname_records))
       _ ->
-        if Enum.include?(cname_chain, List.last(cname_records)) do
+        if Enum.member?(cname_chain, List.last(cname_records)) do
           Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_servfail) # CNAME loop
         else
           name = Exdns.Records.dns_rr(List.last(cname_records), :data) |> Exdns.Records.dns_rrdata_cname(:dname)
@@ -263,7 +264,7 @@ defmodule Exdns.Resolver do
 
   def custom_lookup(qname, qtype, records) do
     fn({module, types}) ->
-      if Lists.include?(types, qtype) || qtype == :dns_terms_const.dns_type_any  do
+      if Lists.member?(types, qtype) || qtype == :dns_terms_const.dns_type_any  do
         module.handle(qname, qtype, records)
       else
         []

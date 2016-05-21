@@ -49,6 +49,11 @@ defmodule Exdns.ZoneCacheTest do
   end
 
 
+  test "in_zone?" do
+    assert Exdns.ZoneCache.in_zone?("example.com")
+  end
+
+
   test "get delegations returns delegation records", %{delegation: ns_record} do
     assert Exdns.ZoneCache.get_delegations("example.com") == []
     assert Exdns.ZoneCache.get_delegations("ns1.example.com") == [ns_record]
