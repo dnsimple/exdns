@@ -2,6 +2,7 @@ defmodule Exdns.ConfigTest do
   use ExUnit.Case, async: true
 
   test "use root hints" do
+    Application.put_env(:exdns, :use_root_hints, false)
     assert Exdns.Config.use_root_hints() == false
   end
 

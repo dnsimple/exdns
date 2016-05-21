@@ -1,5 +1,5 @@
 defmodule Exdns.Config do
-  def use_root_hints(), do: false
+  def use_root_hints(), do: Application.get_env(:exdns, :use_root_hints)
   def storage_type(), do: Exdns.Storage.EtsStorage
   def get_port(), do: 8053
   def get_address(:inet), do: {127, 0, 0, 1}

@@ -24,6 +24,41 @@ defmodule Exdns.Records do
     end
   end
 
+  def root_hints() do
+    {
+      [
+        dns_rr(name: "", type: :dns_terms_const.dns_type_ns, ttl: 518400, data: dns_rrdata_ns(dname: "a.root-servers.net")),
+        dns_rr(name: "", type: :dns_terms_const.dns_type_ns, ttl: 518400, data: dns_rrdata_ns(dname: "b.root-servers.net")),
+        dns_rr(name: "", type: :dns_terms_const.dns_type_ns, ttl: 518400, data: dns_rrdata_ns(dname: "c.root-servers.net")),
+        dns_rr(name: "", type: :dns_terms_const.dns_type_ns, ttl: 518400, data: dns_rrdata_ns(dname: "d.root-servers.net")),
+        dns_rr(name: "", type: :dns_terms_const.dns_type_ns, ttl: 518400, data: dns_rrdata_ns(dname: "e.root-servers.net")),
+        dns_rr(name: "", type: :dns_terms_const.dns_type_ns, ttl: 518400, data: dns_rrdata_ns(dname: "f.root-servers.net")),
+        dns_rr(name: "", type: :dns_terms_const.dns_type_ns, ttl: 518400, data: dns_rrdata_ns(dname: "g.root-servers.net")),
+        dns_rr(name: "", type: :dns_terms_const.dns_type_ns, ttl: 518400, data: dns_rrdata_ns(dname: "h.root-servers.net")),
+        dns_rr(name: "", type: :dns_terms_const.dns_type_ns, ttl: 518400, data: dns_rrdata_ns(dname: "i.root-servers.net")),
+        dns_rr(name: "", type: :dns_terms_const.dns_type_ns, ttl: 518400, data: dns_rrdata_ns(dname: "j.root-servers.net")),
+        dns_rr(name: "", type: :dns_terms_const.dns_type_ns, ttl: 518400, data: dns_rrdata_ns(dname: "k.root-servers.net")),
+        dns_rr(name: "", type: :dns_terms_const.dns_type_ns, ttl: 518400, data: dns_rrdata_ns(dname: "l.root-servers.net")),
+        dns_rr(name: "", type: :dns_terms_const.dns_type_ns, ttl: 518400, data: dns_rrdata_ns(dname: "m.root-servers.net"))
+      ],
+      [
+        dns_rr(name: "a.root-servers.net", type: :dns_terms_const.dns_type_a, ttl: 3600000, data: dns_rrdata_a(ip: {198,41,0,4})),
+        dns_rr(name: "b.root-servers.net", type: :dns_terms_const.dns_type_a, ttl: 3600000, data: dns_rrdata_a(ip: {192,228,79,201})),
+        dns_rr(name: "c.root-servers.net", type: :dns_terms_const.dns_type_a, ttl: 3600000, data: dns_rrdata_a(ip: {192,33,4,12})),
+        dns_rr(name: "d.root-servers.net", type: :dns_terms_const.dns_type_a, ttl: 3600000, data: dns_rrdata_a(ip: {128,8,10,90})),
+        dns_rr(name: "e.root-servers.net", type: :dns_terms_const.dns_type_a, ttl: 3600000, data: dns_rrdata_a(ip: {192,203,230,10})),
+        dns_rr(name: "f.root-servers.net", type: :dns_terms_const.dns_type_a, ttl: 3600000, data: dns_rrdata_a(ip: {192,5,5,241})),
+        dns_rr(name: "g.root-servers.net", type: :dns_terms_const.dns_type_a, ttl: 3600000, data: dns_rrdata_a(ip: {192,112,36,4})),
+        dns_rr(name: "h.root-servers.net", type: :dns_terms_const.dns_type_a, ttl: 3600000, data: dns_rrdata_a(ip: {128,63,2,53})),
+        dns_rr(name: "i.root-servers.net", type: :dns_terms_const.dns_type_a, ttl: 3600000, data: dns_rrdata_a(ip: {192,36,148,17})),
+        dns_rr(name: "j.root-servers.net", type: :dns_terms_const.dns_type_a, ttl: 3600000, data: dns_rrdata_a(ip: {192,58,128,30})),
+        dns_rr(name: "k.root-servers.net", type: :dns_terms_const.dns_type_a, ttl: 3600000, data: dns_rrdata_a(ip: {193,0,14,129})),
+        dns_rr(name: "l.root-servers.net", type: :dns_terms_const.dns_type_a, ttl: 3600000, data: dns_rrdata_a(ip: {198,32,64,12})),
+        dns_rr(name: "m.root-servers.net", type: :dns_terms_const.dns_type_a, ttl: 3600000, data: dns_rrdata_a(ip: {202,12,27,33}))
+      ]
+    }
+  end
+
   # Matchers
 
   def match_name(name) do

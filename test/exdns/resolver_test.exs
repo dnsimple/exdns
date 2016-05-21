@@ -27,13 +27,37 @@ defmodule Exdns.ResolverTest do
     assert length(Exdns.Records.dns_message(answer, :answers)) > 0
   end
 
+  test "resolve with one question for type SOA" do
+    {:ok, zone} = Exdns.ZoneCache.get_zone("example.com")
+    assert zone.authority != :undefined
+    question = Exdns.Records.dns_query(name: "example.com", type: :dns_terms_const.dns_type_soa)
+    message = Exdns.Records.dns_message(questions: [question])
+    answer = Exdns.Resolver.resolve(message, [zone.authority], :host)
+    assert length(Exdns.Records.dns_message(answer, :answers)) > 0
+  end
+
   test "test resolve when not authoritative" do
     question = Exdns.Records.dns_query(name: "notfound.com", type: :dns_terms_const.dns_type_a)
     message = Exdns.Records.dns_message(questions: [question])
     answer = Exdns.Resolver.resolve(message, [], :host)
+    assert Exdns.Records.dns_message(answer, :aa)
+    assert Exdns.Records.dns_message(answer, :rc) == :dns_terms_const.dns_rcode_noerror
     assert length(Exdns.Records.dns_message(answer, :answers)) == 0
     assert length(Exdns.Records.dns_message(answer, :authority)) == 0
     assert length(Exdns.Records.dns_message(answer, :additional)) == 0
+  end
+
+  test "test resolve when not authoritative and returning root hints" do
+    Application.put_env(:exdns, :use_root_hints, true)
+    question = Exdns.Records.dns_query(name: "notfound.com", type: :dns_terms_const.dns_type_a)
+    message = Exdns.Records.dns_message(questions: [question])
+    answer = Exdns.Resolver.resolve(message, [], :host)
+    assert Exdns.Records.dns_message(answer, :aa)
+    assert Exdns.Records.dns_message(answer, :rc) == :dns_terms_const.dns_rcode_noerror
+    assert length(Exdns.Records.dns_message(answer, :answers)) == 0
+    assert length(Exdns.Records.dns_message(answer, :authority)) > 0
+    assert length(Exdns.Records.dns_message(answer, :additional)) > 0
+    Application.put_env(:exdns, :use_root_hints, false)
   end
 
 
