@@ -437,7 +437,10 @@ defmodule Exdns.Resolver do
 
 
   def check_dnssec(message, host, question) do
-    false
+    if Exdns.Edns.get_opts(message)[:dnssec] do
+      Exdns.Events.notify({:dnssec_request, host, Exdns.Records.dns_query(question, :name)})
+    end
+    :ok
   end
 
 

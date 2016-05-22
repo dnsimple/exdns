@@ -14,7 +14,7 @@ defmodule Exdns.ZoneCacheTest do
     zone = %Exdns.ZoneCache.Zone{name: name, authority: soa_record, records: records, records_by_name: Exdns.ZoneParser.build_named_index(records)}
 
     Exdns.ZoneCache.put_zone(name, zone)
-    
+
     {:ok, %{:zone => zone, delegation: ns_record, authority: soa_record, cname_record: cname_record}}
   end
 

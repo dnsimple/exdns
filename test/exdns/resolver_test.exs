@@ -148,7 +148,10 @@ defmodule Exdns.ResolverTest do
 
 
   test "check_dnssec" do
-    assert Exdns.Resolver.check_dnssec(:message, :host, :question) == false
+    opt_rr = Exdns.Records.dns_optrr(dnssec: true)
+    message = Exdns.Records.dns_message(additional: [opt_rr])
+    question = Exdns.Records.dns_query(name: "example.com")
+    assert Exdns.Resolver.check_dnssec(message, :host, question)
   end
 
 end

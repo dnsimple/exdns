@@ -22,6 +22,7 @@ defmodule Exdns.Records do
   Record.defrecord(:dns_rrdata_srv, Record.extract(:dns_rrdata_srv, from_lib: "dns_erlang/include/dns_records.hrl"))
   Record.defrecord(:dns_rrdata_sshfp, Record.extract(:dns_rrdata_sshfp, from_lib: "dns_erlang/include/dns_records.hrl"))
   Record.defrecord(:dns_rrdata_txt, Record.extract(:dns_rrdata_txt, from_lib: "dns_erlang/include/dns_records.hrl"))
+  Record.defrecord(:dns_optrr, Record.extract(:dns_optrr, from_lib: "dns_erlang/include/dns_records.hrl"))
 
 
   # Utility functions

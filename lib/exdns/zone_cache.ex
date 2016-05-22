@@ -11,6 +11,7 @@ defmodule Exdns.ZoneCache do
     GenServer.start_link(__MODULE__, [], name: Exdns.ZoneCache)
   end
   
+  @spec find_zone(:dns.dname()) :: Zone
   def find_zone(qname) do
     find_zone(normalize_name(qname), get_authority(qname))
   end
