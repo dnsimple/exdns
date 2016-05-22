@@ -1,8 +1,7 @@
 defmodule Exdns.ResolverTest do
+  use ExUnit.Case, async: true
   require Logger
   require Exdns.Records
-
-  use ExUnit.Case, async: true
 
   test "resolve with no questions" do
     message = Exdns.Records.dns_message()

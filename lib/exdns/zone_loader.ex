@@ -1,11 +1,9 @@
 defmodule Exdns.ZoneLoader do
   require Logger
 
-  @filename "zones.json"
-
-  def load_zones() do
-    binary = File.read!(filename)
-    Logger.info("Parsing zones JSON from #{filename}")
+  def load_zones do
+    binary = Exdns.Config.zone_file |> File.read!
+    Logger.info("Parsing zones JSON from #{Exdns.Config.zone_file}")
 
     {:ok, json_zones} = JSX.decode(binary)
     Logger.info("Putting zones into cache")
@@ -16,12 +14,5 @@ defmodule Exdns.ZoneLoader do
     end)
     Logger.info("Loaded #{length(json_zones)} zones")
     {:ok, length(json_zones)}
-  end
-
-  defp filename() do
-    case Application.get_env(:exdns, :zones) do
-     filename -> filename
-      _ -> @filename
-    end
   end
 end

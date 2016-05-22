@@ -1,7 +1,6 @@
 defmodule Exdns.ZoneParserTest do
-  require Exdns.Records
-
   use ExUnit.Case, async: true
+  require Exdns.Records
 
   # Zone translation
 

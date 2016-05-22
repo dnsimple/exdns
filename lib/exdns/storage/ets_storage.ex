@@ -1,4 +1,5 @@
 defmodule Exdns.Storage.EtsStorage do
+
   @spec create(atom()) :: :ok | {:error, reason :: term()}
   def create(:schema), do: {:error, :not_implemented}
   def create(name = :lookup_table), do: create_ets_table(name, :bag)
@@ -25,7 +26,7 @@ defmodule Exdns.Storage.EtsStorage do
     {:error, :not_implemented}
   end
 
-  def backup_tables() do
+  def backup_tables do
     {:error, :not_implemented}
   end
 

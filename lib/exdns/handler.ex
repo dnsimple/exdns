@@ -46,7 +46,7 @@ defmodule Exdns.Handler do
   end
 
   defp handle_packet_cache_miss(message, [], _host) do
-    if Exdns.Config.use_root_hints() do
+    if Exdns.Config.use_root_hints? do
       {authority, additional} = Exdns.Records.root_hints()
       Exdns.Records.dns_message(message, aa: false, rc: :dns_terms_const.dns_rcode_refused, authority: authority, additional: additional)
     else
@@ -58,7 +58,7 @@ defmodule Exdns.Handler do
   end
 
   defp safe_handle_packet_cache_miss(message, authority, host) do
-    if Application.get_env(:exdns, :catch_exceptions) do
+    if Exdns.Config.catch_exceptions? do
       try do
         message = Exdns.Resolver.resolve(message, authority, host)
         maybe_cache_packet(message, Exdns.Records.dns_message(message, :aa))

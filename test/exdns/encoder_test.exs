@@ -1,7 +1,6 @@
 defmodule Exdns.EncoderTest do
-  require Exdns.Records
-
   use ExUnit.Case, async: true
+  require Exdns.Records
 
   test "encode message" do
     message = Exdns.Records.dns_message()

@@ -1,9 +1,8 @@
 defmodule Exdns.Worker do
+  use GenServer
   require Logger
   require Record
   require Exdns.Records
-
-  use GenServer
 
   @max_packet_size 512
 

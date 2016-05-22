@@ -1,10 +1,10 @@
 defmodule Exdns.Handler.RegistryTest do
   use ExUnit.Case, async: true
 
+  @handler_module Exdns.Handler.RegistryTest.DummyHandler
+
   defmodule DummyHandler do
   end
-
-  @handler_module Exdns.Handler.RegistryTest.DummyHandler
 
   test "register handler" do
     record_types = [:dns_terms_const.dns_type_a()]

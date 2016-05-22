@@ -1,7 +1,6 @@
 defmodule Exdns.Server.UdpServerTest do
-  require Exdns.Records
-
   use ExUnit.Case, async: false
+  require Exdns.Records
 
   test "server start" do 
     assert Exdns.Server.UdpServer.start_link(:test, :inet, Exdns.Config.get_address(:inet), 12345)

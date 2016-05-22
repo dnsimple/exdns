@@ -1,7 +1,6 @@
 defmodule Exdns.Server.UdpServer do
-  require Logger
-
   use GenServer
+  require Logger
 
   def start_link(name, inet_family, address, port) do
     GenServer.start_link(__MODULE__, [inet_family, address, port], name: name)

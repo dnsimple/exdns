@@ -3,7 +3,7 @@ defmodule Exdns.ZoneParser do
   require Exdns.Records
  
   @doc """
-  Convert a Map structure from exjxs to an Exdns.ZoneCache.Zone instance.
+  Convert a Map structure from exjxs to an Exdns.Zone instance.
 
   The keys `name` and `records` are required.
 
@@ -32,7 +32,7 @@ defmodule Exdns.ZoneParser do
 
     records_by_name = build_named_index(records)
     authorities = Enum.filter(records, Exdns.Records.match_type(:dns_terms_const.dns_type_soa))
-    %Exdns.ZoneCache.Zone{
+    %Exdns.Zone{
       name: name,
       version: sha,
       records: records,

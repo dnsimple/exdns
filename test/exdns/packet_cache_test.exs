@@ -1,7 +1,6 @@
 defmodule Exdns.PacketCacheTest do
-  require Exdns.Records
-
   use ExUnit.Case, async: false
+  require Exdns.Records
 
   test "get question not in cache" do
     assert Exdns.PacketCache.clear()

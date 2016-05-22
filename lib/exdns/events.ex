@@ -1,7 +1,6 @@
 defmodule Exdns.Events do
-  require Logger
-
   use GenEvent
+  require Logger
 
   # Public API
 

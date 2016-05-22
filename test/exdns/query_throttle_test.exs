@@ -1,8 +1,7 @@
 defmodule Exdns.QueryThrottleTest do
+  use ExUnit.Case, async: false
   require Exdns.Records
   require Logger
-
-  use ExUnit.Case, async: false
 
   @ip {1, 2, 3, 4}
 

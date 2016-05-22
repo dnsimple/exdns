@@ -12,16 +12,16 @@ defmodule Exdns.Encoder do
     {false, :dns.message_bin(), :dns.tsig_mac()} |
     {true, :dns.message_bin(), :dns.tsig_mac(), :dns.message()}
   def encode_message(message, opts) do
-    case Application.get_env(:exdns, :catch_exceptions) do
-      {:ok, false} -> :dns.encode_message(message, opts)
-      _ ->
-        try do
-          :dns.encode_message(message, opts)
-        catch
-          e ->
-            Logger.error("Error encoding #{inspect message} (#{e})")
-            encode_message(build_error_message(message))
-        end
+    if Exdns.Config.catch_exceptions? do
+      try do
+        :dns.encode_message(message, opts)
+      catch
+        e ->
+          Logger.error("Error encoding #{inspect message} (#{e})")
+          encode_message(build_error_message(message))
+      end
+    else
+      :dns.encode_message(message, opts)
     end
   end
 

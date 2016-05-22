@@ -1,7 +1,6 @@
 defmodule Exdns.ZoneCacheTest do
-  require Exdns.Records
-
   use ExUnit.Case, async: false
+  require Exdns.Records
 
   setup do
     name = "example.com"
@@ -11,7 +10,7 @@ defmodule Exdns.ZoneCacheTest do
     cname_record = Exdns.Records.dns_rr(name: "www.#{name}", type: :dns_terms_const.dns_type_cname, data: Exdns.Records.dns_rrdata_cname(dname: "something.com"))
 
     records = [soa_record, ns_record, cname_record]
-    zone = %Exdns.ZoneCache.Zone{name: name, authority: soa_record, records: records, records_by_name: Exdns.ZoneParser.build_named_index(records)}
+    zone = %Exdns.Zone{name: name, authority: soa_record, records: records, records_by_name: Exdns.ZoneParser.build_named_index(records)}
 
     Exdns.ZoneCache.put_zone(name, zone)
 

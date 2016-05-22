@@ -31,7 +31,7 @@ defmodule Exdns.Resolver do
   # If no SOA was found, return a no error result.
   # If an SOA is found then start the resolution to match the appropriate records.
   def resolve(message, _, _, {:error, :not_authoritative}, _, _) do
-    if Exdns.Config.use_root_hints() do
+    if Exdns.Config.use_root_hints? do
       {authority, additional} = Exdns.Records.root_hints()
       Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_noerror, authority: authority, additional: additional)
     else
@@ -274,7 +274,7 @@ defmodule Exdns.Resolver do
         # something other than CNAME. Note that the response is still NOERROR error.
         #
         # In the dnstest suite, this is tested by cname_to_unauth_any (and others)
-        if Exdns.Config.use_root_hints() do
+        if Exdns.Config.use_root_hints? do
           {authority, additional} = Exdns.Records.root_hints()
           Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_noerror, authority: authority, additional: additional)
         else

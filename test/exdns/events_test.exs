@@ -1,4 +1,5 @@
 defmodule Exdns.EventsTest do
+  use ExUnit.Case
   require Logger
 
   defmodule EventCapture do
@@ -16,8 +17,6 @@ defmodule Exdns.EventsTest do
       {:ok, Enum.reverse(messages), messages}
     end
   end
-
-  use ExUnit.Case
 
   test "start the event manager" do
     Exdns.Events.start_link()

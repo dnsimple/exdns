@@ -1,7 +1,6 @@
 defmodule Exdns.HandlerTest do
-  require Exdns.Records
-
   use ExUnit.Case, async: true
+  require Exdns.Records
 
   test "handle trailing garbage" do
     message = Exdns.Records.dns_message

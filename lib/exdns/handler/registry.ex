@@ -5,7 +5,7 @@ defmodule Exdns.Handler.Registry do
 
   use GenServer
 
-  def start_link() do
+  def start_link do
     GenServer.start_link(__MODULE__, [], name: Exdns.Handler.Registry)
   end
 
@@ -13,11 +13,11 @@ defmodule Exdns.Handler.Registry do
     GenServer.call(Exdns.Handler.Registry, {:register_handler, record_types, module})
   end
 
-  def get_handlers() do
+  def get_handlers do
     GenServer.call(Exdns.Handler.Registry, {:get_handlers})
   end
 
-  def clear() do
+  def clear do
     GenServer.call(Exdns.Handler.Registry, :clear)
   end
 

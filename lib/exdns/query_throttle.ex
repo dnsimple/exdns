@@ -1,8 +1,7 @@
 defmodule Exdns.QueryThrottle do
-  require Exdns.Records
-  require Logger
-
   use GenServer
+  require Logger
+  require Exdns.Records
 
   @limit 1
   @expiration 60

@@ -1,7 +1,6 @@
 defmodule Exdns.WorkerTest do
-  require Exdns.Records
-
   use ExUnit.Case, async: false
+  require Exdns.Records
 
   setup do
     {:ok, worker} = Exdns.Worker.start_link([])

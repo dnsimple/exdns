@@ -1,7 +1,6 @@
 defmodule Exdns.RecordsTest do
-  require Exdns.Records
-
   use ExUnit.Case, async: true
+  require Exdns.Records
 
   # Records
 

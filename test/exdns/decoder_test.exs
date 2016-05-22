@@ -1,7 +1,6 @@
 defmodule Exdns.DecoderTest do
-  require Exdns.Records
-
   use ExUnit.Case, async: true
+  require Exdns.Records
 
   test "decode empty message" do
     assert Exdns.Decoder.decode_message(<<>>) == {:formerr, :undefined, ""}
