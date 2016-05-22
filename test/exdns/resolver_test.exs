@@ -67,6 +67,21 @@ defmodule Exdns.ResolverTest do
   end
 
 
+  test "type matched records" do
+    soa_rr = Exdns.Records.dns_rr(type: :dns_terms_const.dns_type_soa)
+    a_rr = Exdns.Records.dns_rr(type: :dns_terms_const.dns_type_a)
+    records = [soa_rr, a_rr]
+    assert Exdns.Resolver.type_match_records(records, :dns_terms_const.dns_type_soa) == [soa_rr]
+    assert Exdns.Resolver.type_match_records(records, :dns_terms_const.dns_type_any) == [soa_rr, a_rr]
+    assert Exdns.Resolver.type_match_records(records, :dns_terms_const.dns_type_cname) == []
+  end
+
+
+  test "filter records" do
+    # TBD
+  end
+
+
   test "rewrite SOA ttl" do
     soa_rrdata = Exdns.Records.dns_rrdata_soa(minimum: 60)
     soa_rr = Exdns.Records.dns_rr(name: "example.com", type: :dns_terms_const.dns_type_soa, ttl: 3600, data: soa_rrdata)
@@ -74,6 +89,10 @@ defmodule Exdns.ResolverTest do
     assert Exdns.Resolver.rewrite_soa_ttl(message) |> Exdns.Records.dns_message(:authority) |> List.last |> Exdns.Records.dns_rr(:ttl) == 60
   end
 
+
+  test "additional processing" do
+    # TBD
+  end
 
   test "requires additional processing with no answers returns the names that are being checked" do
     assert Exdns.Resolver.requires_additional_processing([], [:name]) == [:name]

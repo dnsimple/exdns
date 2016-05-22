@@ -72,14 +72,42 @@ defmodule Exdns.ZoneParser do
     end
   end
 
+  def json_record_to_rr(%{"name" => name, "type" => "AAAA", "ttl" => ttl, "data" => data}) do
+    raw_ip = data["ip"]
+    case :inet_parse.address(to_char_list(raw_ip)) do
+      {:ok, address} -> Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_aaaa, data: Exdns.Records.dns_rrdata_aaaa(ip: address), ttl: ttl)
+      {:error, reason} -> Logger.error("Failed to parse AAAA record address #{raw_ip}: #{reason}")
+    end
+  end
+
   def json_record_to_rr(%{"name" => name, "type" => "CNAME", "ttl" => ttl, "data" => data}) do
     rrdata = Exdns.Records.dns_rrdata_cname(dname: data["dname"])
     Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_cname, data: rrdata, ttl: ttl)
   end
 
+  def json_record_to_rr(%{"name" => name, "type" => "HINFO", "ttl" => ttl, "data" => data}) do
+    rrdata = Exdns.Records.dns_rrdata_hinfo(cpu: data["cpu"], os: data["os"])
+    Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_hinfo, data: rrdata, ttl: ttl)
+  end
+
+  def json_record_to_rr(%{"name" => name, "type" => "MX", "ttl" => ttl, "data" => data}) do
+    rrdata = Exdns.Records.dns_rrdata_mx(exchange: data["exchange"], preference: data["preference"])
+    Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_mx, data: rrdata, ttl: ttl)
+  end
+
+  def json_record_to_rr(%{"name" => name, "type" => "NAPTR", "ttl" => ttl, "data" => data}) do
+    rrdata = Exdns.Records.dns_rrdata_naptr(order: data["order"], preference: data["preference"], flags: data["flags"], services: data["services"], regexp: data["regexp"], replacement: data["replacement"])
+    Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_naptr, data: rrdata, ttl: ttl)
+  end
+
   def json_record_to_rr(%{"name" => name, "type" => "NS", "ttl" => ttl, "data" => data}) do
     rrdata = Exdns.Records.dns_rrdata_ns(dname: data["dname"])
     Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_ns, data: rrdata, ttl: ttl)
+  end
+
+  def json_record_to_rr(%{"name" => name, "type" => "RP", "ttl" => ttl, "data" => data}) do
+    rrdata = Exdns.Records.dns_rrdata_rp(mbox: data["mbox"], txt: data["txt"])
+    Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_rp, data: rrdata, ttl: ttl)
   end
 
   def json_record_to_rr(%{"name" => name, "type" => "SOA", "ttl" => ttl, "data" => data}) do
@@ -88,7 +116,28 @@ defmodule Exdns.ZoneParser do
       expire: data["expire"], minimum: data["minimum"])
     Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_soa, data: rrdata, ttl: ttl)
   end
-  
+
+  def json_record_to_rr(%{"name" => name, "type" => "SPF", "ttl" => ttl, "data" => data}) do
+    rrdata = Exdns.Records.dns_rrdata_spf(spf: data["spf"])
+    Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_spf, data: rrdata, ttl: ttl)
+  end
+
+  def json_record_to_rr(%{"name" => name, "type" => "SRV", "ttl" => ttl, "data" => data}) do
+    rrdata = Exdns.Records.dns_rrdata_srv(priority: data["priority"], weight: data["weight"], port: data["port"], target: data["target"])
+    Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_srv, data: rrdata, ttl: ttl)
+  end
+
+
+  def json_record_to_rr(%{"name" => name, "type" => "SSHFP", "ttl" => ttl, "data" => data}) do
+    rrdata = Exdns.Records.dns_rrdata_sshfp(alg: data["alg"], fp_type: data["fp_type"], fp: Base.decode16!(data["fp"], case: :mixed))
+    Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_sshfp, data: rrdata, ttl: ttl)
+  end
+
+  def json_record_to_rr(%{"name" => name, "type" => "TXT", "ttl" => ttl, "data" => data}) do
+    rrdata = Exdns.Records.dns_rrdata_txt(txt: Exdns.Txt.parse(data["txt"]))
+    Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_txt, data: rrdata, ttl: ttl)
+  end
+
 
   @doc """
   Builds an index for the given records, where each key is a unique name and 
@@ -106,4 +155,5 @@ defmodule Exdns.ZoneParser do
       records -> build_named_index(rest, Map.put(index, Exdns.ZoneCache.normalize_name(name), records ++ [r]))
     end
   end
+
 end

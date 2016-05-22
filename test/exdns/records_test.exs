@@ -48,14 +48,52 @@ defmodule Exdns.RecordsTest do
     assert Exdns.Records.dns_rrdata_a(rrdata, :ip) == :undefined
   end
 
+  test "dns resource record data type AAAA construction" do
+    rrdata = Exdns.Records.dns_rrdata_aaaa()
+    assert Exdns.Records.dns_rrdata_aaaa(rrdata, :ip) == :undefined
+  end
+
   test "dns resource record data type CNAME construction" do
     rrdata = Exdns.Records.dns_rrdata_cname()
     assert Exdns.Records.dns_rrdata_cname(rrdata, :dname) == :undefined
   end
 
+  test "dns resource record data type HINFO construction" do
+    rrdata = Exdns.Records.dns_rrdata_hinfo()
+    assert Exdns.Records.dns_rrdata_hinfo(rrdata, :cpu) == :undefined
+    assert Exdns.Records.dns_rrdata_hinfo(rrdata, :os) == :undefined
+  end
+
+  test "dns resource record data type MX construction" do
+    rrdata = Exdns.Records.dns_rrdata_mx()
+    assert Exdns.Records.dns_rrdata_mx(rrdata, :exchange) == :undefined
+    assert Exdns.Records.dns_rrdata_mx(rrdata, :preference) == :undefined
+  end
+
+  test "dns resource record data type NAPTR construction" do
+    rrdata = Exdns.Records.dns_rrdata_naptr()
+    assert Exdns.Records.dns_rrdata_naptr(rrdata, :order) == :undefined
+    assert Exdns.Records.dns_rrdata_naptr(rrdata, :preference) == :undefined
+    assert Exdns.Records.dns_rrdata_naptr(rrdata, :flags) == :undefined
+    assert Exdns.Records.dns_rrdata_naptr(rrdata, :services) == :undefined
+    assert Exdns.Records.dns_rrdata_naptr(rrdata, :regexp) == :undefined
+    assert Exdns.Records.dns_rrdata_naptr(rrdata, :replacement) == :undefined
+  end
+
   test "dns resource record data type NS construction" do
     rrdata = Exdns.Records.dns_rrdata_ns()
     assert Exdns.Records.dns_rrdata_ns(rrdata, :dname) == :undefined
+  end
+
+  test "dns resource record data type PTR construction" do
+    rrdata = Exdns.Records.dns_rrdata_ptr()
+    assert Exdns.Records.dns_rrdata_ptr(rrdata, :dname) == :undefined
+  end
+
+  test "dns resource record data type RP construction" do
+    rrdata = Exdns.Records.dns_rrdata_rp()
+    assert Exdns.Records.dns_rrdata_rp(rrdata, :mbox) == :undefined
+    assert Exdns.Records.dns_rrdata_rp(rrdata, :txt) == :undefined
   end
 
   test "dns resource record data type SOA construction" do
@@ -67,6 +105,31 @@ defmodule Exdns.RecordsTest do
     assert Exdns.Records.dns_rrdata_soa(rrdata, :retry) == :undefined
     assert Exdns.Records.dns_rrdata_soa(rrdata, :expire) == :undefined
     assert Exdns.Records.dns_rrdata_soa(rrdata, :minimum) == :undefined
+  end
+
+  test "dns resource record data type SPF construction" do
+    rrdata = Exdns.Records.dns_rrdata_spf()
+    assert Exdns.Records.dns_rrdata_spf(rrdata, :spf) == :undefined
+  end
+
+  test "dns resource record data type SRV construction" do
+    rrdata = Exdns.Records.dns_rrdata_srv()
+    assert Exdns.Records.dns_rrdata_srv(rrdata, :priority) == :undefined
+    assert Exdns.Records.dns_rrdata_srv(rrdata, :weight) == :undefined
+    assert Exdns.Records.dns_rrdata_srv(rrdata, :port) == :undefined
+    assert Exdns.Records.dns_rrdata_srv(rrdata, :target) == :undefined
+  end
+
+  test "dns resource record data type SSHFP construction" do
+    rrdata = Exdns.Records.dns_rrdata_sshfp()
+    assert Exdns.Records.dns_rrdata_sshfp(rrdata, :alg) == :undefined
+    assert Exdns.Records.dns_rrdata_sshfp(rrdata, :fp_type) == :undefined
+    assert Exdns.Records.dns_rrdata_sshfp(rrdata, :fp) == :undefined
+  end
+
+  test "dns resource record data type TXT construction" do
+    rrdata = Exdns.Records.dns_rrdata_txt()
+    assert Exdns.Records.dns_rrdata_txt(rrdata, :txt) == :undefined
   end
 
   # Utility functions
@@ -123,6 +186,13 @@ defmodule Exdns.RecordsTest do
     name = "ns1.example.com"
     rr = Exdns.Records.dns_rr(data: Exdns.Records.dns_rrdata_ns(dname: name))
     assert Enum.all?([rr], Exdns.Records.match_delegation(name))
+  end
+
+  # Replacement functions
+
+  test "replace name" do
+    rr = Exdns.Records.dns_rr(name: "foo")
+    assert Enum.map([rr], Exdns.Records.replace_name("bar")) == [Exdns.Records.dns_rr(name: "bar")]
   end
 
 end

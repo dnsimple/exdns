@@ -9,9 +9,19 @@ defmodule Exdns.Records do
   Record.defrecord(:dns_query, Record.extract(:dns_query, from_lib: "dns_erlang/include/dns_records.hrl"))
   Record.defrecord(:dns_rr, Record.extract(:dns_rr, from_lib: "dns_erlang/include/dns_records.hrl"))
   Record.defrecord(:dns_rrdata_a, Record.extract(:dns_rrdata_a, from_lib: "dns_erlang/include/dns_records.hrl"))
+  Record.defrecord(:dns_rrdata_aaaa, Record.extract(:dns_rrdata_aaaa, from_lib: "dns_erlang/include/dns_records.hrl"))
   Record.defrecord(:dns_rrdata_cname, Record.extract(:dns_rrdata_cname, from_lib: "dns_erlang/include/dns_records.hrl"))
+  Record.defrecord(:dns_rrdata_hinfo, Record.extract(:dns_rrdata_hinfo, from_lib: "dns_erlang/include/dns_records.hrl"))
+  Record.defrecord(:dns_rrdata_mx, Record.extract(:dns_rrdata_mx, from_lib: "dns_erlang/include/dns_records.hrl"))
+  Record.defrecord(:dns_rrdata_naptr, Record.extract(:dns_rrdata_naptr, from_lib: "dns_erlang/include/dns_records.hrl"))
   Record.defrecord(:dns_rrdata_ns, Record.extract(:dns_rrdata_ns, from_lib: "dns_erlang/include/dns_records.hrl"))
+  Record.defrecord(:dns_rrdata_ptr, Record.extract(:dns_rrdata_ptr, from_lib: "dns_erlang/include/dns_records.hrl"))
+  Record.defrecord(:dns_rrdata_rp, Record.extract(:dns_rrdata_rp, from_lib: "dns_erlang/include/dns_records.hrl"))
   Record.defrecord(:dns_rrdata_soa, Record.extract(:dns_rrdata_soa, from_lib: "dns_erlang/include/dns_records.hrl"))
+  Record.defrecord(:dns_rrdata_spf, Record.extract(:dns_rrdata_spf, from_lib: "dns_erlang/include/dns_records.hrl"))
+  Record.defrecord(:dns_rrdata_srv, Record.extract(:dns_rrdata_srv, from_lib: "dns_erlang/include/dns_records.hrl"))
+  Record.defrecord(:dns_rrdata_sshfp, Record.extract(:dns_rrdata_sshfp, from_lib: "dns_erlang/include/dns_records.hrl"))
+  Record.defrecord(:dns_rrdata_txt, Record.extract(:dns_rrdata_txt, from_lib: "dns_erlang/include/dns_records.hrl"))
 
 
   # Utility functions
@@ -118,4 +128,11 @@ defmodule Exdns.Records do
     end
   end
 
+  # Replacement functions
+
+  def replace_name(name) do
+    fn(r) ->
+      dns_rr(name: name)
+    end
+  end
 end

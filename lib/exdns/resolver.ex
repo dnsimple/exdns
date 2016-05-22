@@ -19,15 +19,17 @@ defmodule Exdns.Resolver do
     resolve(Exdns.Records.dns_message(message, ra: false, ad: false), authority, Exdns.Records.dns_query(question, :name), Exdns.Records.dns_query(question, :type), host)
   end
 
-  # Step 2 - With the qname and qtype in hand, find the nearest zone
+  # Step 2: Search the available zones for the zone which is the nearest ancestor to qname
+  # With the qname and qtype in hand, find the nearest zone.
   def resolve(message, authority, qname, qtype, host) do
     zone = Exdns.ZoneCache.find_zone(qname, authority)
     message = resolve(message, qname, qtype, zone, host, _cname_chain = [])
     rewrite_soa_ttl(message) |> additional_processing(host, zone)
   end
 
-  # Step 3 - If no SOA was found, return a no error result. If an SOA is found
-  #          then start the resolution to match the appropriate records
+  # Step 3: Match records
+  # If no SOA was found, return a no error result.
+  # If an SOA is found then start the resolution to match the appropriate records.
   def resolve(message, _, _, {:error, :not_authoritative}, _, _) do
     if Exdns.Config.use_root_hints() do
       {authority, additional} = Exdns.Records.root_hints()
@@ -36,7 +38,6 @@ defmodule Exdns.Resolver do
       Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_noerror)
     end
   end
-
   def resolve(message, qname, qtype, zone, host, cname_chain) do
     case Exdns.ZoneCache.get_records_by_name(qname) do
       [] ->
@@ -48,12 +49,10 @@ defmodule Exdns.Resolver do
     end
   end
 
-  # Resolution logic
-
-  def best_match_resolution(message, qname, qtype, host, cname_chain, matched_records, zone) do
-    message
-  end
-
+  # Exact match resolution logic
+  # 
+  # Functions in this section are used when there is at least one record that matches
+  # the qname exactly.
 
   # Determine if there is a CNAME anywhere in the records with the given qname.
   def exact_match_resolution(message, qname, qtype, host, cname_chain, matched_records, zone) do
@@ -219,7 +218,6 @@ defmodule Exdns.Resolver do
   end
 
 
-  
   def restart_query(message, name, qtype, host, cname_chain, zone, in_zone) do
     if in_zone do
       # The CNAME is in the zone so we do not need to look it up again.
@@ -233,9 +231,101 @@ defmodule Exdns.Resolver do
 
   def restart_delegated_query(message, name, qtype, host, cname_chain, zone, in_zone) do
     if in_zone do
-
+      resolve(message, name, qtype, zone, host, cname_chain)
     else
-      
+      resolve(message, name, qtype, Exdns.ZoneCache.find_zone(name, zone.authority), host, cname_chain)
+    end
+  end
+
+  # Best meatch resolution logic
+  #
+  # Functions in this section are used when there is no exact match for the given qname.
+  # Best match looks for wildcard records that match.
+
+  # There was no match for the qname, so we use the best matches found.
+  # If there are no NS records in the matches then this is not a referral.
+  # If there are NS records in the best matches this is a referral.
+  def best_match_resolution(message, qname, qtype, host, cname_chain, best_match_records, zone) do
+    referral_records = Enum.filter(best_match_records, Exdns.Records.match_type(:dns_terms_const.dns_type_ns)) # NS lookup
+    case referral_records do
+      [] -> resolve_best_match(message, qname, qtype, host, cname_chain, best_match_records, zone)
+      _ -> resolve_best_match_referral(message, qname, qtype, host, cname_chain, best_match_records, zone, referral_records)
+    end
+  end
+
+  # There was no referral present, so check to see if there is a wildcard.
+  # If there is a wildcard, then continue resolution with the wildcard.
+  # If there is no wildcard then the result is NXDOMAIN.
+  def resolve_best_match(message, qname, qtype, host, cname_chain, best_match_records, zone) do
+    if Enum.any?(best_match_records, Exdns.Records.match_wildcard) do
+      cname_records =
+        Enum.map(best_match_records, Exdns.Records.replace_name(qname)) |>
+        Enum.filter(Exdns.Records.match_type(:dns_terms_const.dns_type_cname))
+      resolve_best_match_with_wildcard(message, qname, qtype, host, cname_chain, best_match_records, zone, cname_records)
+    else
+      [q|_] = Exdns.Records.dns_message(message, :questions)
+      if qname == Exdns.Records.dns_query(q, :name) do
+        Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_nxdomain, authority: [Zone.authority])
+      else
+        # This happens when we have a CNAME to an out-of-balliwick hostname and the query is for
+        # something other than CNAME. Note that the response is still NOERROR error.
+        #
+        # In the dnstest suite, this is tested by cname_to_unauth_any (and others)
+        if Exdns.Config.use_root_hints() do
+          {authority, additional} = Exdns.Records.root_hints()
+          Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_noerror, authority: authority, additional: additional)
+        else
+          message
+        end
+      end
+    end
+  end
+
+
+  def resolve_best_match_with_wildcard(message, qname, qtype, host, cname_chain, matched_records, zone, cname_records) do
+    case cname_records do
+      [] ->
+        type_matches = Enum.map(type_match_records(matched_records, qtype), Exdns.Records.replace_name(qname))
+        case type_matches do
+          [] ->
+            # Ask custom handlers for their records
+            records =
+              Exdns.Handler.Registry.get_handlers() |>
+              Enum.map(custom_lookup(qname, qtype, matched_records)) |>
+              List.flatten |>
+              Enum.map(Exdns.Records.replace_name(qname))
+            resolve_best_match_with_wildcard(message, qname, qtype, host, cname_chain, matched_records, zone, [], records)
+          _ ->
+            resolve_best_match_with_wildcard(message, qname, qtype, host, cname_chain, matched_records, zone, [], type_matches)
+        end
+    end
+  end
+  def resolve_best_match_with_wildcard(message, qname, qtype, host, cname_chain, best_match_records, zone, [], []) do
+    Exdns.Records.dns_message(message, aa: true, authority: [zone.authority])
+  end
+  def resolve_best_match_with_wildcard(message, qname, qtype, host, cname_chain, best_match_records, zone, [], type_matches) do
+    Exdns.Records.dns_message(message, aa: true, answers: merge_with_answers(message, type_matches))
+  end
+
+
+
+  # There are referral records present.
+  #
+  # If there are no SOA records present then we indicate we are not authoritivate for the name.
+  # If there is an SOA record then we authoritative for the name
+  def resolve_best_match_referral(message, qname, qtype, host, cname_chain, best_match_records, zone, referral_records) do
+    if qtype == :dns_terms_const.dns_type_any do
+      message
+    else
+      authority = Enum.filter(best_match_records, Exdns.Records.match_type(:dns_terms_const.dns_type_soa))
+      case {cname_chain, authority} do
+        {_, []} ->
+          Exdns.Records.dns_message(message, aa: false, authority: merge_with_authority(message, referral_records))
+        {[], _} ->
+          Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_nxdomain, authority: authority)
+        {_, _} ->
+          Exdns.Records.dns_message(message, authority: authority)
+      end
     end
   end
 
@@ -269,6 +359,15 @@ defmodule Exdns.Resolver do
       else
         []
       end
+    end
+  end
+
+
+  def type_match_records(records, qtype) do
+    any_type = :dns_terms_const.dns_type_any
+    case qtype do
+      ^any_type -> filter_records(records, Exdns.Handler.Registry.get_handlers())
+      _ -> Enum.filter(records, Exdns.Records.match_type(qtype))
     end
   end
 
