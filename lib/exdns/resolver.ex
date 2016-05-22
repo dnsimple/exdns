@@ -291,9 +291,7 @@ defmodule Exdns.Resolver do
       [] ->
         Logger.debug("No CNAME records, checking for type matches in #{inspect matched_records}")
         records = type_match_records(matched_records, qtype)
-        Logger.debug("Type match records: #{inspect records}")
         type_matches = Enum.map(records, Exdns.Records.replace_name(qname))
-        Logger.debug("Type matches: #{inspect type_matches}")
         case type_matches do
           [] ->
             # Ask custom handlers for their records
