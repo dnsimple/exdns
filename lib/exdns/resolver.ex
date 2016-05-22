@@ -114,6 +114,7 @@ defmodule Exdns.Resolver do
         end
       _ ->
         # Exact type match for something other than an NS record and the SOA is present
+        Logger.debug("Exact type match for something other than NS and SOA is present: #{inspect matched_records}")
         answer = List.last(matched_records)
         case ns_records = Exdns.ZoneCache.get_delegations(Exdns.Records.dns_rr(answer, :name)) do
           [] ->
@@ -147,6 +148,7 @@ defmodule Exdns.Resolver do
     ns_record = List.last(ns_records)
     name = Exdns.Records.dns_rr(ns_record, :name)
     if name == Exdns.Records.dns_rr(answer, :name) do
+      Logger.debug("NS record name matches the answer name")
       Exdns.Records.dns_message(message, aa: false, rc: :dns_terms_const.dns_rcode_noerror, authority: merge_with_authority(message, ns_records))
     else
       # TODO: only restart delegation if the NS record is on a parent node
@@ -341,17 +343,16 @@ defmodule Exdns.Resolver do
   # If there is an SOA record then we authoritative for the name
   def resolve_best_match_referral(message, qname, qtype, host, cname_chain, best_match_records, zone, referral_records) do
     authority = Enum.filter(best_match_records, Exdns.Records.match_type(:dns_terms_const.dns_type_soa))
-    if qtype == :dns_terms_const.dns_type_any do
-      Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_nxdomain, authority: authority)
-    else
-      case {cname_chain, authority} do
-        {_, []} ->
-          Exdns.Records.dns_message(message, aa: false, authority: merge_with_authority(message, referral_records))
-        {[], _} ->
-          Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_nxdomain, authority: authority)
-        {_, _} ->
-          Exdns.Records.dns_message(message, authority: authority)
-      end
+    any_type = :dns_terms_const.dns_type_any
+    case {qtype, cname_chain, authority} do
+      {_, _, []} ->
+        Exdns.Records.dns_message(message, aa: false, authority: merge_with_authority(message, referral_records))
+      {_, [], _} ->
+        Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_nxdomain, authority: authority)
+      {^any_type, _, _} ->
+        message
+      {_, _, _} ->
+        Exdns.Records.dns_message(message, authority: authority)
     end
   end
 
