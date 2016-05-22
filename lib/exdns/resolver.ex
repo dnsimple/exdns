@@ -138,7 +138,7 @@ defmodule Exdns.Resolver do
   # We are authoritative and there are no NS records here
   def resolve_exact_type_match(message, qname, qtype, host, cname_chain, matched_records, zone, authority_records, []) do
     Logger.debug("Resolved exact type match and there are no NS records: #{inspect matched_records}")
-    dm(Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_noerror, answers: merge_with_answers(message, matched_records)))
+    Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_noerror, answers: merge_with_answers(message, matched_records))
   end
   # We are authoritative and there are NS records here
   def resolve_exact_type_match(message, qname, qtype, host, cname_chain, matched_records, zone, authority_records, ns_records) do
@@ -456,12 +456,6 @@ defmodule Exdns.Resolver do
 
   defp merge_with_authority(message, records) do
     Exdns.Records.dns_message(message, :authority) ++ records
-  end
-
-
-  defp dm(message) do
-    Logger.debug("Message: #{inspect message}")
-    message
   end
 
 end
