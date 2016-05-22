@@ -121,8 +121,8 @@ defmodule Exdns.Resolver do
           _ ->
             ns_record = List.last(ns_records)
             case Exdns.ZoneCache.get_authority(qname) do
-              {:ok, [soa_record]} ->
-                if Exdns.Records.dns_rr(soa_record, :name) == Exdns.Records.dns_record(ns_record, :name) do
+              {:ok, soa_record} ->
+                if Exdns.Records.dns_rr(soa_record, :name) == Exdns.Records.dns_rr(ns_record, :name) do
                   answers = merge_with_answers(message, matched_records)
                   Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_noerror, answers: answers)
                 else
@@ -174,7 +174,7 @@ defmodule Exdns.Resolver do
       ^any_type -> Exdns.Records.dns_message(message, aa: true, authority: authority_records)
       _ ->
         case {referral_records, exact_type_matches} do
-          {[], []} -> Exdns.Records.dns_message(message, aa: true, authority: [Zone.authority])
+          {[], []} -> Exdns.Records.dns_message(message, aa: true, authority: [zone.authority])
           {[], _} -> Exdns.Records.dns_message(message, aa: true, answers: merge_with_answers(message, exact_type_matches))
           {_, _} -> resolve_exact_match_referral(message, qtype, matched_records, referral_records, authority_records)
         end
@@ -257,6 +257,7 @@ defmodule Exdns.Resolver do
   # If there is a wildcard, then continue resolution with the wildcard.
   # If there is no wildcard then the result is NXDOMAIN.
   def resolve_best_match(message, qname, qtype, host, cname_chain, best_match_records, zone) do
+    Logger.debug("No referral present, trying wildcard")
     if Enum.any?(best_match_records, Exdns.Records.match_wildcard) do
       cname_records =
         Enum.map(best_match_records, Exdns.Records.replace_name(qname)) |>
@@ -265,7 +266,7 @@ defmodule Exdns.Resolver do
     else
       [q|_] = Exdns.Records.dns_message(message, :questions)
       if qname == Exdns.Records.dns_query(q, :name) do
-        Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_nxdomain, authority: [Zone.authority])
+        Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_nxdomain, authority: [zone.authority])
       else
         # This happens when we have a CNAME to an out-of-balliwick hostname and the query is for
         # something other than CNAME. Note that the response is still NOERROR error.
@@ -283,9 +284,14 @@ defmodule Exdns.Resolver do
 
 
   def resolve_best_match_with_wildcard(message, qname, qtype, host, cname_chain, matched_records, zone, cname_records) do
+    Logger.debug("Resolving best match with wildcard")
     case cname_records do
       [] ->
-        type_matches = Enum.map(type_match_records(matched_records, qtype), Exdns.Records.replace_name(qname))
+        Logger.debug("No CNAME records, checking for type matches in #{inspect matched_records}")
+        records = type_match_records(matched_records, qtype)
+        Logger.debug("Type match records: #{inspect records}")
+        type_matches = Enum.map(records, Exdns.Records.replace_name(qname))
+        Logger.debug("Type matches: #{inspect type_matches}")
         case type_matches do
           [] ->
             # Ask custom handlers for their records
@@ -298,6 +304,8 @@ defmodule Exdns.Resolver do
           _ ->
             resolve_best_match_with_wildcard(message, qname, qtype, host, cname_chain, matched_records, zone, [], type_matches)
         end
+      _ ->
+        resolve_best_match_with_wildcard_cname(message, qname, qtype, host, cname_chain, matched_records, zone, cname_records)
     end
   end
   def resolve_best_match_with_wildcard(message, qname, qtype, host, cname_chain, best_match_records, zone, [], []) do
@@ -307,6 +315,24 @@ defmodule Exdns.Resolver do
     Exdns.Records.dns_message(message, aa: true, answers: merge_with_answers(message, type_matches))
   end
 
+
+  def resolve_best_match_with_wildcard_cname(message, qname, qtype, host, cname_chain, best_match_records, zone, cname_records) do
+    cname_type = :dns_terms_const.dns_type_cname
+    case qtype do
+      ^cname_type ->
+        Exdns.Records.dns_message(message, aa: true, answers: merge_with_answers(message, cname_records))
+      _ ->
+        # There should only be one CNAME, Multiple CNAMEs kill unicorns.
+        cname_record = List.last(cname_records)
+        if Enum.member?(cname_chain, cname_record) do
+          Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_servfail)
+        else
+          name = Exdns.Records.dns_rr(cname_record, :data) |> Exdns.Records.dns_rrdata_cname(:dname)
+          Exdns.Records.dns_message(message, aa: true, answers: merge_with_answers(message, cname_records)) |>
+            restart_query(name, qtype, host, cname_chain ++ cname_records, zone, Exdns.ZoneCache.in_zone?(name))
+        end
+    end
+  end
 
 
   # There are referral records present.

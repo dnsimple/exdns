@@ -5,7 +5,7 @@ defmodule Exdns.ZoneLoader do
 
   def load_zones() do
     binary = File.read!(filename)
-    Logger.info("Parsing zones JSON")
+    Logger.info("Parsing zones JSON from #{filename}")
 
     {:ok, json_zones} = JSX.decode(binary)
     Logger.info("Putting zones into cache")
@@ -20,7 +20,7 @@ defmodule Exdns.ZoneLoader do
 
   defp filename() do
     case Application.get_env(:exdns, :zones) do
-      {:ok, filename} -> filename
+     filename -> filename
       _ -> @filename
     end
   end

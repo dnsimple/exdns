@@ -132,7 +132,7 @@ defmodule Exdns.Records do
 
   def replace_name(name) do
     fn(r) ->
-      dns_rr(name: name)
+      dns_rr(r, name: name)
     end
   end
 end

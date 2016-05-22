@@ -67,16 +67,22 @@ defmodule Exdns.ZoneParser do
   def json_record_to_rr(%{"name" => name, "type" => "A", "ttl" => ttl, "data" => data}) do
     raw_ip = data["ip"]
     case :inet_parse.address(to_char_list(raw_ip)) do
-      {:ok, address} -> Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_a, data: Exdns.Records.dns_rrdata_a(ip: address), ttl: ttl)
-      {:error, reason} -> Logger.error("Failed to parse A record address #{raw_ip}: #{reason}")
+      {:ok, address} ->
+        Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_a, data: Exdns.Records.dns_rrdata_a(ip: address), ttl: ttl)
+      {:error, reason} ->
+        Logger.error("Failed to parse A record address #{raw_ip}: #{reason}")
+        {}
     end
   end
 
   def json_record_to_rr(%{"name" => name, "type" => "AAAA", "ttl" => ttl, "data" => data}) do
     raw_ip = data["ip"]
     case :inet_parse.address(to_char_list(raw_ip)) do
-      {:ok, address} -> Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_aaaa, data: Exdns.Records.dns_rrdata_aaaa(ip: address), ttl: ttl)
-      {:error, reason} -> Logger.error("Failed to parse AAAA record address #{raw_ip}: #{reason}")
+      {:ok, address} ->
+        Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_aaaa, data: Exdns.Records.dns_rrdata_aaaa(ip: address), ttl: ttl)
+      {:error, reason} ->
+        Logger.error("Failed to parse AAAA record address #{raw_ip}: #{reason}")
+        {}
     end
   end
 
@@ -136,6 +142,11 @@ defmodule Exdns.ZoneParser do
   def json_record_to_rr(%{"name" => name, "type" => "TXT", "ttl" => ttl, "data" => data}) do
     rrdata = Exdns.Records.dns_rrdata_txt(txt: Exdns.Txt.parse(data["txt"]))
     Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_txt, data: rrdata, ttl: ttl)
+  end
+
+  def json_record_to_rr(data) do
+    Logger.debug("Cannot convert #{data}")
+    {}
   end
 
 

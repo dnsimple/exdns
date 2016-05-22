@@ -12,7 +12,7 @@ defmodule Exdns.ResolverTest do
   test "resolve with one question for type A" do
     {:ok, zone} = Exdns.ZoneCache.get_zone("example.com")
     assert zone.authority != :undefined
-    question = Exdns.Records.dns_query(name: "example.com", type: :dns_terms_const.dns_type_a)
+    question = Exdns.Records.dns_query(name: "outpost.example.com", type: :dns_terms_const.dns_type_a)
     message = Exdns.Records.dns_message(questions: [question])
     answer = Exdns.Resolver.resolve(message, [zone.authority], :host)
     assert length(Exdns.Records.dns_message(answer, :answers)) > 0
@@ -59,6 +59,42 @@ defmodule Exdns.ResolverTest do
     assert length(Exdns.Records.dns_message(answer, :authority)) > 0
     assert length(Exdns.Records.dns_message(answer, :additional)) > 0
     Application.put_env(:exdns, :use_root_hints, false)
+  end
+
+  test "test any wildcard" do
+    {:ok, zone} = Exdns.ZoneCache.get_zone("wtest.com")
+    assert zone.authority != :undefined
+    question = Exdns.Records.dns_query(name: "fwejfiwerrfj.something.wtest.com", type: :dns_terms_const.dns_type_a)
+    message = Exdns.Records.dns_message(questions: [question])
+    answer = Exdns.Resolver.resolve(message, zone.authority, :host)
+    assert Exdns.Records.dns_message(answer, :aa)
+    assert length(Exdns.Records.dns_message(answer, :answers)) > 0
+    assert length(Exdns.Records.dns_message(answer, :authority)) == 0
+    assert length(Exdns.Records.dns_message(answer, :additional)) == 0
+  end
+
+  test "cname and wildcard at root" do
+    {:ok, zone} = Exdns.ZoneCache.get_zone("wtest.com")
+    assert zone.authority != :undefined
+    question = Exdns.Records.dns_query(name: "secure.wtest.com", type: :dns_terms_const.dns_type_a)
+    message = Exdns.Records.dns_message(questions: [question])
+    answer = Exdns.Resolver.resolve(message, zone.authority, :host)
+    assert Exdns.Records.dns_message(answer, :aa)
+    assert length(Exdns.Records.dns_message(answer, :answers)) == 0
+    assert length(Exdns.Records.dns_message(answer, :authority)) > 0
+    assert length(Exdns.Records.dns_message(answer, :additional)) == 0
+  end
+
+  test "cname and wildcard but no correct type" do
+    {:ok, zone} = Exdns.ZoneCache.get_zone("test.com")
+    assert zone.authority != :undefined
+    question = Exdns.Records.dns_query(name: "yo.test.test.com", type: :dns_terms_const.dns_type_aaaa)
+    message = Exdns.Records.dns_message(questions: [question])
+    answer = Exdns.Resolver.resolve(message, zone.authority, :host)
+    assert Exdns.Records.dns_message(answer, :aa)
+    assert length(Exdns.Records.dns_message(answer, :answers)) > 0
+    assert length(Exdns.Records.dns_message(answer, :authority)) > 0
+    assert length(Exdns.Records.dns_message(answer, :additional)) == 0
   end
 
 

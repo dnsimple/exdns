@@ -14,7 +14,6 @@ defmodule Exdns do
 
     # Load custom zone encoders
 
-    Logger.info("Loading zones from local file")
     Exdns.ZoneLoader.load_zones()
 
     Logger.info("Starting servers")
