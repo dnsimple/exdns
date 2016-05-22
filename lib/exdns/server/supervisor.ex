@@ -14,8 +14,8 @@ defmodule Exdns.Server.Supervisor do
   end
 
   def stop_children() do
-    children = Supervisor.which_children(Exdns.Server.Supervisor)
-    Enum.map(children, fn(c) -> Supervisor.terminate_child(Exdns.Server.Supervisor, c) end)
+    Supervisor.which_children(Exdns.Server.Supervisor) |>
+      Enum.map(fn(c) -> Supervisor.terminate_child(Exdns.Server.Supervisor, c) end)
     :ok
   end
 

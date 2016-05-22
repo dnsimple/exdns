@@ -27,13 +27,7 @@ defmodule Exdns.Encoder do
 
   # Private functions
 
-  defp build_error_message({_, message}) do
-    build_error_message(message, :dns_term_const.dns_rcode_servfail)
-  end
-  defp build_error_message(message) do
-    build_error_message(message, :dns_term_const.dns_rcode_servfail)
-  end
-  defp build_error_message(message, rcode) do
-    Exdns.Records.dns_message(rc: rcode)
-  end
+  defp build_error_message({_, message}), do: build_error_message(message, :dns_term_const.dns_rcode_servfail)
+  defp build_error_message(message), do: build_error_message(message, :dns_term_const.dns_rcode_servfail)
+  defp build_error_message(message, rcode), do: Exdns.Records.dns_message(rc: rcode)
 end

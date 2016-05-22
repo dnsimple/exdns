@@ -41,8 +41,7 @@ defmodule Exdns.Server.UdpServer do
   end
 
   def handle_info({:udp, socket, host, port, bin}, state) do
-    #response = :folsom_metrics.histogram_timed_update(:udp_handoff_histogram, Exdns.Server.UdpServer, :handle_request, [socket, host, port, bin, state])
-    response = handle_request(socket, host, port, bin, state)
+    response = :folsom_metrics.histogram_timed_update(:udp_handoff_histogram, Exdns.Server.UdpServer, :handle_request, [socket, host, port, bin, state])
     :inet.setopts(Map.get(state, :socket), [{:active, :once}])
     response
   end
@@ -100,12 +99,8 @@ defmodule Exdns.Server.UdpServer do
   end
 
 
-  defp make_workers(queue) do
-    make_workers(queue, Exdns.Config.get_num_workers())
-  end
-  defp make_workers(queue, num_workers) do
-    make_workers(queue, num_workers, 1)
-  end
+  defp make_workers(queue), do: make_workers(queue, Exdns.Config.get_num_workers())
+  defp make_workers(queue, num_workers), do: make_workers(queue, num_workers, 1)
   defp make_workers(queue, num_workers, n) do
     if n < num_workers do
       {:ok, worker_pid} = Exdns.Worker.start_link([])

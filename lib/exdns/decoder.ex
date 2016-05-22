@@ -9,7 +9,7 @@ defmodule Exdns.Decoder do
         try do
           :dns.decode_message(bin)
         catch
-          e -> 
+          e ->
             Logger.error("Error decoding #{inspect bin}: #{e}")
             {:formerr, e, bin}
         end

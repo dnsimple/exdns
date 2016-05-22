@@ -1,6 +1,6 @@
 defmodule Exdns.Storage do
   # Public API
-  
+
   def create(table) do
     mod().create(table)
   end

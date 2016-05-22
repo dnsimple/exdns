@@ -6,13 +6,10 @@ defmodule Exdns.Handler do
   def handle({:trailing_garbage, message, _}, context) do
     handle(message, context)
   end
-
   def handle(message, context = {_, host}) when Record.is_record(message, :dns_message) do
     handle(message, host, Exdns.QueryThrottle.throttle(message, context))
   end
-
   def handle(bad_message, {_, host}) do
-    # Logger.error("Received a bad message: #{inspect bad_message} from #{host}")
     bad_message
   end
 
@@ -23,7 +20,6 @@ defmodule Exdns.Handler do
     :folsom_metrics.notify({:request_throttled_meter, 1})
     Exdns.Records.dns_message(message, tc: true, aa: true, rc: :dns_terms_const.dns_rcode_noerror)
   end
-
   defp handle(message, host, _) do
     Logger.debug("Questions: #{inspect Exdns.Records.dns_message(message, :questions)}")
     Exdns.Events.notify({:start_handle, [{:host, host}, {:message, message}]})
@@ -57,7 +53,6 @@ defmodule Exdns.Handler do
       Exdns.Records.dns_message(message, aa: false, rc: :dns_terms_const.dns_rcode_refused)
     end
   end
-
   defp handle_packet_cache_miss(message, authority, host) do
     safe_handle_packet_cache_miss(Exdns.Records.dns_message(message, ra: false), authority, host)
   end
@@ -105,8 +100,8 @@ defmodule Exdns.Handler do
 
   defp notify_empty_response(message) do
     rr_count = Exdns.Records.dns_message(message, :anc) + Exdns.Records.dns_message(message, :auc) + Exdns.Records.dns_message(message, :adc)
-    dns_rcode_refused = :dns_terms_const.dns_rcode_refused()
 
+    dns_rcode_refused = :dns_terms_const.dns_rcode_refused()
     case {Exdns.Records.dns_message(message, :rc), rr_count} do
       {^dns_rcode_refused, _} ->
         Exdns.Events.notify({:refused_response, Exdns.Records.dns_message(message, :questions)})

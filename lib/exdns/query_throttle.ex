@@ -49,18 +49,15 @@ defmodule Exdns.QueryThrottle do
     {:ok, tref} = :timer.apply_interval(@sweep_interval, Exdns.QueryThrottle, :sweep, [])
     {:ok, %{tref: tref}}
   end
-
   def handle_call(:clear, _from, state) do
     Exdns.Storage.empty_table(:host_throttle)
     {:reply, :ok, state}
   end
-
   def handle_call(:sweep, _from, state) do
-    keys = Exdns.Storage.select(:host_throttle, [{{:"$1", {:"_", :"$2"}}, [{:<, :"$2", Exdns.timestamp() - @expiration}], [:"$1"]}], :infinite)
-    Enum.each(keys, fn(k) -> Exdns.Storage.delete(:host_throttle, k) end)
+    Exdns.Storage.select(:host_throttle, [{{:"$1", {:"_", :"$2"}}, [{:<, :"$2", Exdns.timestamp() - @expiration}], [:"$1"]}], :infinite) |>
+      Enum.each(fn(k) -> Exdns.Storage.delete(:host_throttle, k) end)
     {:reply, :ok, state}
   end
-
   def handle_call(:stop, _from, state) do
     {:stop, :normal, :ok, state}
   end
@@ -87,7 +84,6 @@ defmodule Exdns.QueryThrottle do
   defp is_throttled({127, 0, 0, 1}, req_count, _) do
     {false, req_count + 1}
   end
-
   defp is_throttled(host, req_count, last_request_at) do
     exceeds_limit = req_count >= @limit
     expired = Exdns.timestamp() - last_request_at > @expiration

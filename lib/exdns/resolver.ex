@@ -414,7 +414,8 @@ defmodule Exdns.Resolver do
     case record_names do
       [] -> message
       _ ->
-        records = Enum.map(record_names, fn(name) -> Exdns.ZoneCache.get_records_by_name(name) end) |>
+        records =
+          Enum.map(record_names, fn(name) -> Exdns.ZoneCache.get_records_by_name(name) end) |>
           List.flatten |>
           Enum.filter(Exdns.Records.match_types([:dns_terms_const.dns_type_a, :dns_terms_const.dns_type_aaaa]))
         case records do

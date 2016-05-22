@@ -21,7 +21,6 @@ use Mix.Config
 #     config :logger, level: :info
 #
 
-# config :logger, :console, level: :fatal
 config :exdns, catch_exceptions: true
 
 # It is also possible to import configuration files, relative to this
