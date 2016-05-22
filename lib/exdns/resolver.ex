@@ -340,10 +340,10 @@ defmodule Exdns.Resolver do
   # If there are no SOA records present then we indicate we are not authoritivate for the name.
   # If there is an SOA record then we authoritative for the name
   def resolve_best_match_referral(message, qname, qtype, host, cname_chain, best_match_records, zone, referral_records) do
+    authority = Enum.filter(best_match_records, Exdns.Records.match_type(:dns_terms_const.dns_type_soa))
     if qtype == :dns_terms_const.dns_type_any do
-      message
+      Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_nxdomain, authority: authority)
     else
-      authority = Enum.filter(best_match_records, Exdns.Records.match_type(:dns_terms_const.dns_type_soa))
       case {cname_chain, authority} do
         {_, []} ->
           Exdns.Records.dns_message(message, aa: false, authority: merge_with_authority(message, referral_records))
