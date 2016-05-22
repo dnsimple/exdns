@@ -39,7 +39,7 @@ defmodule Exdns.Resolver do
     end
   end
   def resolve(message, qname, qtype, zone, host, cname_chain) do
-    case Exdns.ZoneCache.get_records_by_name(qname) do
+    case Enum.dedup(Exdns.ZoneCache.get_records_by_name(qname)) do
       [] ->
         Logger.debug("No exact match by name, using best match resolution")
         best_match_resolution(message, qname, qtype, host, cname_chain, best_match(qname, zone), zone)

@@ -97,6 +97,18 @@ defmodule Exdns.ResolverTest do
     assert length(Exdns.Records.dns_message(answer, :additional)) == 0
   end
 
+  test "same record only appears in answer set once" do
+    {:ok, zone} = Exdns.ZoneCache.get_zone("example.com")
+    assert zone.authority != :undefined
+    question = Exdns.Records.dns_query(name: "double.example.com", type: :dns_terms_const.dns_type_a)
+    message = Exdns.Records.dns_message(questions: [question])
+    answer = Exdns.Resolver.resolve(message, zone.authority, :host)
+    assert Exdns.Records.dns_message(answer, :aa)
+    assert length(Exdns.Records.dns_message(answer, :answers)) == 1
+    assert length(Exdns.Records.dns_message(answer, :authority)) == 0
+    assert length(Exdns.Records.dns_message(answer, :additional)) == 0
+  end
+
 
   test "parent?" do
     assert Exdns.Resolver.parent?("example.com", "example.com")
