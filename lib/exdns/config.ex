@@ -2,6 +2,7 @@ defmodule Exdns.Config do
   @moduledoc """
   Configuration details for exdns.
   """
+
   def catch_exceptions?, do: Application.get_env(:exdns, :catch_exceptions, true)
 
   def use_root_hints?, do: Application.get_env(:exdns, :use_root_hints, false)
