@@ -21,8 +21,7 @@ defmodule Exdns.Server.UdpServer do
   # GenServer callbacks 
 
   def init([inet_family, address, port]) do
-    {:ok, socket} = start(address, port, inet_family)
-    {:ok, %{address: address, port: port, socket: socket, workers: Exdns.Worker.make_workers(:queue.new())}}
+    init([inet_family, address, port, []])
   end
 
   def init([inet_family, address, port, socket_opts]) do
@@ -75,25 +74,10 @@ defmodule Exdns.Server.UdpServer do
   end
 
   # Private functions
-  defp start(address, port, inet_family) do
-    case :gen_udp.open(port, [:binary, {:active, :once}, {:reuseaddr, true}, {:read_packets, 1000}, {:ip, address}, inet_family]) do
-      {:ok, socket} ->
-        # Logger.info("UDP server #{inet_family} opened socket")
-        {:ok, socket}
-      {:error, :eacces} ->
-        Logger.error("Failed to open UDP socket. Need to run as sudo?")
-        {:error, :eacces}
-      {:error, reason} ->
-        Logger.error("Error occurred: #{reason}")
-        {:error, reason}
-    end
-  end
-
   defp start(address, port, inet_family, socket_opts) do
-    # Logger.info("Starting UDP server for #{inet_family} on address #{inspect address} and port #{port} (sockopts: #{inspect socket_opts}")
+    Logger.debug("Starting UDP server for #{inet_family} on address #{inspect address} and port #{port} (sockopts: #{inspect socket_opts}")
     case :gen_udp.open(port, [:binary, {:active, :once}, {:reuseaddr, true}, {:read_packets, 1000}, {:ip, address}, inet_family|socket_opts]) do
       {:ok, socket} ->
-        # Logger.info("UDP server #{inet_family} with address #{inspect address} opened socket: #{inspect socket}")
         {:ok, socket}
       {:error, :eacces} ->
         Logger.error("Failed to open UDP socket. Need to run as sudo?")

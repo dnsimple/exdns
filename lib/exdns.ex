@@ -11,16 +11,14 @@ defmodule Exdns do
   end
 
   def start_phase(:post_start, _start_type, _phase_args) do
-    Logger.info("Post start phase")
     Exdns.Events.add_handler(Exdns.Events, [])
 
-    # Load custom parsers
+    # TODO: Load custom parsers
 
-    # Load custom zone encoders
+    # TODO: Load custom zone encoders
 
     Exdns.ZoneLoader.load_zones()
 
-    Logger.info("Starting servers")
     Exdns.Events.notify(:start_servers)
 
     :ok
