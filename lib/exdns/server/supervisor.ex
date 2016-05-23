@@ -28,7 +28,7 @@ defmodule Exdns.Server.Supervisor do
     Enum.map(servers, &define_server/1) |> supervise(strategy: :one_for_one)
   end
 
-  def define_server(server = %{name: name, type: type, address: raw_ip, port: port, family: family}) do
+  def define_server(%{name: name, type: type, address: raw_ip, port: port, family: family}) do
     case :inet_parse.address(to_char_list(raw_ip)) do
       {:ok, address} -> worker(type, [name, family, address, port], id: name, restart: :permanent, timeout: 5000)
       {:error, reason} -> raise ArgumentError, reason
