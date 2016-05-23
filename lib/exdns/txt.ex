@@ -1,4 +1,8 @@
 defmodule Exdns.Txt do
+  @moduledoc """
+  Functions for parsing TXT record content.
+  """
+
   require Logger
 
   @max_txt_size 255

@@ -1,4 +1,8 @@
 defmodule Exdns.ZoneCache do
+  @moduledoc """
+  In-memory cache for all zones.
+  """
+
   use GenServer
   require Logger
   require Exdns.Records

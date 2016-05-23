@@ -1,4 +1,8 @@
 defmodule Exdns.Encoder do
+  @moduledoc """
+  Functions for encoding DNS messages to binary representations safely.
+  """
+
   require Logger
   require Exdns.Records
 

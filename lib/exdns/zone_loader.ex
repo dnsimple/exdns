@@ -1,4 +1,10 @@
 defmodule Exdns.ZoneLoader do
+  @moduledoc """
+  Logic for loading zone data from a source.
+
+  Currently only loading from the filesystem is supported.
+  """
+
   require Logger
 
   def load_zones do

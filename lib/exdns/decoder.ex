@@ -1,4 +1,8 @@
 defmodule Exdns.Decoder do
+  @moduledoc """
+  Functions used to decode DNS messages safely.
+  """
+
   require Logger
 
   @spec decode_message(:dns.message_bin()) :: {:dns.decode_error(), :dns.message() | :undefined, binary()} | :dns.message()

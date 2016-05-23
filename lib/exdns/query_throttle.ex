@@ -1,4 +1,10 @@
 defmodule Exdns.QueryThrottle do
+  @moduledoc """
+  Implements query throttling.
+
+  At the moment this throttle only throttles ANY queries over UDP.
+  """
+
   use GenServer
   require Logger
   require Exdns.Records

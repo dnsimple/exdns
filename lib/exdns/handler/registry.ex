@@ -1,6 +1,6 @@
 defmodule Exdns.Handler.Registry do
   @moduledoc """
-  Handler registry
+  Registry for custom handlers. 
   """
 
   use GenServer

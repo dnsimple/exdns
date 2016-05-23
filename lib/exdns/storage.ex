@@ -1,4 +1,8 @@
 defmodule Exdns.Storage do
+  @moduledoc """
+  Interface for storage engines.
+  """
+
   # Public API
 
   def create(table) do

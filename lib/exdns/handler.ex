@@ -1,4 +1,10 @@
 defmodule Exdns.Handler do
+  @moduledoc """
+  Functions for handling DNS messages.
+
+  Servers hand off to workers, which use these handler functions to answer DNS questions.
+  """
+
   require Logger
   require Record
   require Exdns.Records

@@ -1,4 +1,8 @@
 defmodule Exdns.Server.Supervisor do
+  @moduledoc """
+  Supervisor for server processes, including UDP and TCP server processes.
+  """
+
   use Supervisor
   require Logger
 

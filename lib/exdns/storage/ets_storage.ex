@@ -1,4 +1,7 @@
 defmodule Exdns.Storage.EtsStorage do
+  @moduledoc """
+  Storage engine backed by ETS
+  """
 
   @spec create(atom()) :: :ok | {:error, reason :: term()}
   def create(:schema), do: {:error, :not_implemented}

@@ -1,4 +1,9 @@
 defmodule Exdns.Worker do
+  @moduledoc """
+  Servers hand off requests to workers for processing, freeing up server processes
+  so they can continue receiving data from the network.
+  """
+
   use GenServer
   require Logger
   require Record

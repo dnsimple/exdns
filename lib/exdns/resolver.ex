@@ -1,4 +1,8 @@
 defmodule Exdns.Resolver do
+  @moduledoc """
+  Provides the core logic for deciding what records to return for DNS queries.
+  """
+
   require Record
   require Logger
   require Exdns.Records

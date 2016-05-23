@@ -1,4 +1,8 @@
 defmodule Exdns do
+  @moduledoc """
+  exdns is a port of the erldns authoritative name server written in Elixir.
+  """
+
   require Logger
 
   def start(_type, _args) do

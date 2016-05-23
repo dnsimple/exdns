@@ -1,4 +1,8 @@
 defmodule Exdns.PacketCache do
+  @moduledoc """
+  Short-lived packet cache for faster responses of questions that were recently answered.
+  """
+
   use GenServer
 
   @enabled true

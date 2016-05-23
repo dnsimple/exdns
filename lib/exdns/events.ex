@@ -1,4 +1,8 @@
 defmodule Exdns.Events do
+  @moduledoc """
+  Event manager for events fired by exdns.
+  """
+
   use GenEvent
   require Logger
 

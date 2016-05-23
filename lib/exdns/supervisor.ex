@@ -1,4 +1,8 @@
 defmodule Exdns.Supervisor do
+  @moduledoc """
+  Exdns application supervisor
+  """
+
   use Supervisor
   require Logger
 

@@ -1,7 +1,11 @@
 defmodule Exdns.Edns do
+  @moduledoc """
+  EDNS0 support (extensions for DNS)
+  """
+
   require Record
   require Exdns.Records
-  
+
   def get_opts(message), do: get_opts(Exdns.Records.dns_message(message, :additional), [])
 
   def get_opts([], opts), do: opts

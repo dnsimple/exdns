@@ -1,4 +1,8 @@
 defmodule Exdns.Server.UdpServer do
+  @moduledoc """
+  Server for receiving UDP packets.
+  """
+
   use GenServer
   require Logger
 

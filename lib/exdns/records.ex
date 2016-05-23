@@ -1,6 +1,9 @@
 # Imports all of the records from dns_erlang/include/dns_records.hrl
-
 defmodule Exdns.Records do
+  @moduledoc """
+  Functions for DNS record construction, filtering and other record utilities.
+  """
+
   require Record
 
   # Records brought in from dns_erlang
