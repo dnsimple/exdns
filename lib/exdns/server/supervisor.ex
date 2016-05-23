@@ -29,9 +29,9 @@ defmodule Exdns.Server.Supervisor do
   def define_servers([]) do
     [
       worker(Exdns.Server.UdpServer, [:udp_inet, :inet, Exdns.Config.get_address(:inet), Exdns.Config.get_port()], id: :udp_inet, restart: :permanent, timeout: 5000),
-      worker(Exdns.Server.UdpServer, [:udp_inet6, :inet6, Exdns.Config.get_address(:inet6), Exdns.Config.get_port()], id: :udp_inet6, restart: :permanent, timeout: 5000)
-      #worker(Exdns.Server.TcpServer, [:tcp_inet, :inet, Exdns.Config.get_address(:inet), Exdns.Config.get_port()], id: :tcp_inet, restart: :permanent, timeout: 5000),
-      #worker(Exdns.Server.TcpServer, [:tcp_inet6, :inet6], id: :tcp_inet6, restart: :permanent, timeout: 5000),
+      worker(Exdns.Server.UdpServer, [:udp_inet6, :inet6, Exdns.Config.get_address(:inet6), Exdns.Config.get_port()], id: :udp_inet6, restart: :permanent, timeout: 5000),
+      worker(Exdns.Server.TcpServer, [:tcp_inet, :inet, Exdns.Config.get_address(:inet), Exdns.Config.get_port()], id: :tcp_inet, restart: :permanent, timeout: 5000),
+      worker(Exdns.Server.TcpServer, [:tcp_inet6, :inet6, Exdns.Config.get_address(:inet6), Exdns.Config.get_port()], id: :tcp_inet6, restart: :permanent, timeout: 5000)
     ]
   end
 end

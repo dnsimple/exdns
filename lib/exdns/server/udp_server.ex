@@ -75,7 +75,6 @@ defmodule Exdns.Server.UdpServer do
 
   # Private functions
   defp start(address, port, inet_family, socket_opts) do
-    Logger.debug("Starting UDP server for #{inet_family} on address #{inspect address} and port #{port} (sockopts: #{inspect socket_opts}")
     case :gen_udp.open(port, [:binary, {:active, :once}, {:reuseaddr, true}, {:read_packets, 1000}, {:ip, address}, inet_family|socket_opts]) do
       {:ok, socket} ->
         {:ok, socket}
