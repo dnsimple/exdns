@@ -22,7 +22,7 @@ defmodule Exdns.ZoneParser do
       case apply_context_options(r) do
         :pass ->
           case json_record_to_rr(r) do
-            {} -> try_custom_parsers(r, [])
+            {} -> try_custom_parsers(r, Exdns.ZoneParser.Registry.get_all)
             record -> record
           end
         _ ->
@@ -57,8 +57,12 @@ defmodule Exdns.ZoneParser do
   end
   def apply_context_options(_), do: :pass
 
-  def try_custom_parsers(record, parsers) do
-    {}
+  def try_custom_parsers(record, []), do: {}
+  def try_custom_parsers(record, [parser|rest]) do
+    case parser.json_record_to_rr(record) do
+      {} -> try_custom_parsers(record, rest)
+      r -> r
+    end
   end
 
   @doc """
@@ -145,7 +149,7 @@ defmodule Exdns.ZoneParser do
   end
 
   def json_record_to_rr(data) do
-    Logger.debug("Cannot convert #{data}")
+    Logger.debug("Cannot convert #{inspect data}")
     {}
   end
 

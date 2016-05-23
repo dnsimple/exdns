@@ -14,7 +14,7 @@ defmodule Exdns.Supervisor do
     children = [
       worker(Exdns.Events, []),
       worker(Exdns.ZoneCache, []),
-      # worker(Exdns.ZoneParser, []),
+      worker(Exdns.ZoneParser.Registry, []),
       # worker(Exdns.ZoneEncoder, []),
       worker(Exdns.PacketCache, []),
       worker(Exdns.QueryThrottle, []),
