@@ -7,10 +7,11 @@ defmodule Exdns.Server.UdpServer do
   require Logger
 
   def start_link(name, inet_family, address, port) do
-    GenServer.start_link(__MODULE__, [inet_family, address, port], name: name)
+    start_link(name, inet_family, address, port, [])
   end
 
   def start_link(name, inet_family, address, port, socket_opts) do
+    Logger.debug("Starting UDP server for #{inet_family} on address #{inspect address} port #{port}")
     GenServer.start_link(__MODULE__, [inet_family, address, port, socket_opts], name: name)
   end
 
