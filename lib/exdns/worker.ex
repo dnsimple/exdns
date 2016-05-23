@@ -15,6 +15,17 @@ defmodule Exdns.Worker do
     GenServer.start_link(__MODULE__, []) 
   end
 
+  def make_workers(queue), do: make_workers(queue, Exdns.Config.get_num_workers())
+  def make_workers(queue, num_workers), do: make_workers(queue, num_workers, 1)
+  def make_workers(queue, num_workers, n) do
+    if n < num_workers do
+      {:ok, worker_pid} = Exdns.Worker.start_link([])
+      make_workers(:queue.in(worker_pid, queue), num_workers, n + 1)
+    else
+      queue
+    end
+  end
+
   # GenServer callbacks
   def init([]) do
     {:ok, %{}}

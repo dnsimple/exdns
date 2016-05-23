@@ -22,12 +22,12 @@ defmodule Exdns.Server.UdpServer do
 
   def init([inet_family, address, port]) do
     {:ok, socket} = start(address, port, inet_family)
-    {:ok, %{address: address, port: port, socket: socket, workers: make_workers(:queue.new())}}
+    {:ok, %{address: address, port: port, socket: socket, workers: Exdns.Worker.make_workers(:queue.new())}}
   end
 
   def init([inet_family, address, port, socket_opts]) do
     {:ok, socket} = start(address, port, inet_family, socket_opts)
-    {:ok, %{address: address, port: port, socket: socket, workers: make_workers(:queue.new())}}
+    {:ok, %{address: address, port: port, socket: socket, workers: Exdns.Worker.make_workers(:queue.new())}}
   end
 
   def handle_call(:stop, _from, state) do
@@ -98,18 +98,6 @@ defmodule Exdns.Server.UdpServer do
       {:error, :eacces} ->
         Logger.error("Failed to open UDP socket. Need to run as sudo?")
         {:error, :eacces}
-    end
-  end
-
-
-  defp make_workers(queue), do: make_workers(queue, Exdns.Config.get_num_workers())
-  defp make_workers(queue, num_workers), do: make_workers(queue, num_workers, 1)
-  defp make_workers(queue, num_workers, n) do
-    if n < num_workers do
-      {:ok, worker_pid} = Exdns.Worker.start_link([])
-      make_workers(:queue.in(worker_pid, queue), num_workers, n + 1)
-    else
-      queue
     end
   end
 end
