@@ -5,7 +5,6 @@ defmodule Exdns.Worker do
   """
 
   use GenServer
-  require Logger
   require Record
   require Exdns.Records
 

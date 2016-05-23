@@ -4,7 +4,6 @@ defmodule Exdns.Zone.Cache do
   """
 
   use GenServer
-  require Logger
   require Exdns.Records
 
   def start_link() do

@@ -3,8 +3,6 @@ defmodule Exdns.Txt do
   Functions for parsing TXT record content.
   """
 
-  require Logger
-
   @max_txt_size 255
 
   def parse(v) when is_binary(v), do: List.flatten(parse(to_char_list(v)))

@@ -6,7 +6,6 @@ defmodule Exdns.QueryThrottle do
   """
 
   use GenServer
-  require Logger
   require Exdns.Records
 
   @limit 1

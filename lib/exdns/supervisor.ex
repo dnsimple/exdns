@@ -4,7 +4,6 @@ defmodule Exdns.Supervisor do
   """
 
   use Supervisor
-  require Logger
 
   def start_link do
     Supervisor.start_link(__MODULE__, :ok, name: Exdns.Supervisor)
