@@ -13,8 +13,8 @@ defmodule Exdns.Supervisor do
   def init(_args) do
     children = [
       worker(Exdns.Events, []),
-      worker(Exdns.ZoneCache, []),
-      worker(Exdns.ZoneParser.Registry, []),
+      worker(Exdns.Zone.Cache, []),
+      worker(Exdns.Zone.Registry, []),
       # worker(Exdns.ZoneEncoder, []),
       worker(Exdns.PacketCache, []),
       worker(Exdns.QueryThrottle, []),

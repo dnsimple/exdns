@@ -1,4 +1,4 @@
-defmodule Exdns.ZoneCache do
+defmodule Exdns.Zone.Cache do
   @moduledoc """
   In-memory cache for all zones.
   """
@@ -8,7 +8,7 @@ defmodule Exdns.ZoneCache do
   require Exdns.Records
 
   def start_link() do
-    GenServer.start_link(__MODULE__, [], name: Exdns.ZoneCache)
+    GenServer.start_link(__MODULE__, [], name: Exdns.Zone.Cache)
   end
 
   def find_zone(qname) do

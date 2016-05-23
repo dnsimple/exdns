@@ -1,4 +1,4 @@
-defmodule Exdns.ZoneLoader do
+defmodule Exdns.Zone.Loader do
   @moduledoc """
   Logic for loading zone data from a source.
 
@@ -15,8 +15,8 @@ defmodule Exdns.ZoneLoader do
     Logger.info("Putting zones into cache")
 
     Enum.each(json_zones, fn(json_zone) ->
-      zone = Exdns.ZoneParser.json_to_zone(json_zone)
-      Exdns.ZoneCache.put_zone(zone.name, zone)
+      zone = Exdns.Zone.Parser.json_to_zone(json_zone)
+      Exdns.Zone.Cache.put_zone(zone.name, zone)
     end)
     Logger.info("Loaded #{length(json_zones)} zones")
     {:ok, length(json_zones)}

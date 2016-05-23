@@ -26,7 +26,7 @@ defmodule Exdns.Resolver do
   # Step 2: Search the available zones for the zone which is the nearest ancestor to qname
   # With the qname and qtype in hand, find the nearest zone.
   def resolve(message, authority, qname, qtype, host) do
-    zone = Exdns.ZoneCache.find_zone(qname, authority)
+    zone = Exdns.Zone.Cache.find_zone(qname, authority)
     message = resolve(message, qname, qtype, zone, host, _cname_chain = [])
     rewrite_soa_ttl(message) |> additional_processing(host, zone)
   end
@@ -43,7 +43,7 @@ defmodule Exdns.Resolver do
     end
   end
   def resolve(message, qname, qtype, zone, host, cname_chain) do
-    case Enum.dedup(Exdns.ZoneCache.get_records_by_name(qname)) do
+    case Enum.dedup(Exdns.Zone.Cache.get_records_by_name(qname)) do
       [] ->
         Logger.debug("No exact match by name, using best match resolution")
         best_match_resolution(message, qname, qtype, host, cname_chain, best_match(qname, zone), zone)
@@ -110,7 +110,7 @@ defmodule Exdns.Resolver do
             # Exact type match for NS query, but there is no SOA for the zone
             name = Exdns.Records.dns_rr(List.last(matched_records), :name)
             # It isn't clear what the qtype should be on a delegated start, so I assume an A record
-            restart_delegated_query(message, name, :dns_terms_const.dns_type_a, host, cname_chain, zone, Exdns.ZoneCache.in_zone?(name))
+            restart_delegated_query(message, name, :dns_terms_const.dns_type_a, host, cname_chain, zone, Exdns.Zone.Cache.in_zone?(name))
           _ ->
             # Exact type match for NS query and there is an SOA records.
             answers = Exdns.Records.dns_message(message, :answers) ++ matched_records
@@ -120,12 +120,12 @@ defmodule Exdns.Resolver do
         # Exact type match for something other than an NS record and the SOA is present
         Logger.debug("Exact type match for something other than NS and SOA is present: #{inspect matched_records}")
         answer = List.last(matched_records)
-        case ns_records = Exdns.ZoneCache.get_delegations(Exdns.Records.dns_rr(answer, :name)) do
+        case ns_records = Exdns.Zone.Cache.get_delegations(Exdns.Records.dns_rr(answer, :name)) do
           [] ->
             resolve_exact_type_match(message, qname, qtype, host, cname_chain, matched_records, zone, authority_records, ns_records = [])
           _ ->
             ns_record = List.last(ns_records)
-            case Exdns.ZoneCache.get_authority(qname) do
+            case Exdns.Zone.Cache.get_authority(qname) do
               {:ok, soa_record} ->
                 if Exdns.Records.dns_rr(soa_record, :name) == Exdns.Records.dns_rr(ns_record, :name) do
                   answers = merge_with_answers(message, matched_records)
@@ -158,7 +158,7 @@ defmodule Exdns.Resolver do
       # TODO: only restart delegation if the NS record is on a parent node
       # if it is a sibling then we should not restart
       if parent?(name, Exdns.Records.dns_rr(answer, :name)) do
-        restart_delegated_query(message, name, qtype, host, cname_chain, zone, Exdns.ZoneCache.in_zone?(name))
+        restart_delegated_query(message, name, qtype, host, cname_chain, zone, Exdns.Zone.Cache.in_zone?(name))
       else
         Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_noerror, answers: merge_with_answers(message, matched_records))
       end
@@ -218,7 +218,7 @@ defmodule Exdns.Resolver do
           Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_servfail) # CNAME loop
         else
           name = Exdns.Records.dns_rr(List.last(cname_records), :data) |> Exdns.Records.dns_rrdata_cname(:dname)
-          restart_query(Exdns.Records.dns_message(message, aa: true, answers: Exdns.Records.dns_message(message, :answers) ++ cname_records), name, qtype, host, cname_chain ++ cname_records, zone, Exdns.ZoneCache.in_zone?(name))
+          restart_query(Exdns.Records.dns_message(message, aa: true, answers: Exdns.Records.dns_message(message, :answers) ++ cname_records), name, qtype, host, cname_chain ++ cname_records, zone, Exdns.Zone.Cache.in_zone?(name))
         end
     end
   end
@@ -230,7 +230,7 @@ defmodule Exdns.Resolver do
       resolve(message, name, qtype, zone, host, cname_chain)
     else
       # The CNAME is not in the zone so we need to find the zone using the CNAME content
-      resolve(message, name, qtype, Exdns.ZoneCache.find_zone(name), host, cname_chain)
+      resolve(message, name, qtype, Exdns.Zone.Cache.find_zone(name), host, cname_chain)
     end
   end
 
@@ -239,7 +239,7 @@ defmodule Exdns.Resolver do
     if in_zone do
       resolve(message, name, qtype, zone, host, cname_chain)
     else
-      resolve(message, name, qtype, Exdns.ZoneCache.find_zone(name, zone.authority), host, cname_chain)
+      resolve(message, name, qtype, Exdns.Zone.Cache.find_zone(name, zone.authority), host, cname_chain)
     end
   end
 
@@ -333,7 +333,7 @@ defmodule Exdns.Resolver do
         else
           name = Exdns.Records.dns_rr(cname_record, :data) |> Exdns.Records.dns_rrdata_cname(:dname)
           Exdns.Records.dns_message(message, aa: true, answers: merge_with_answers(message, cname_records)) |>
-            restart_query(name, qtype, host, cname_chain ++ cname_records, zone, Exdns.ZoneCache.in_zone?(name))
+            restart_query(name, qtype, host, cname_chain ++ cname_records, zone, Exdns.Zone.Cache.in_zone?(name))
         end
     end
   end
@@ -365,14 +365,14 @@ defmodule Exdns.Resolver do
   def best_match(_, [], _), do: []
   # Wildcard
   def best_match(qname, [_|rest], zone) do
-    best_match(qname, rest, zone, Exdns.ZoneCache.get_records_by_name(:dns.labels_to_dname(["*"] ++ rest)))
+    best_match(qname, rest, zone, Exdns.Zone.Cache.get_records_by_name(:dns.labels_to_dname(["*"] ++ rest)))
   end
 
   # No labels, no wildcard name
   def best_match(_, [], _, []), do: []
   # Labels, no wildcard name
   def best_match(qname, labels, zone, []) do
-   case Exdns.ZoneCache.get_records_by_name(:dns.labels_to_dname(labels)) do
+   case Exdns.Zone.Cache.get_records_by_name(:dns.labels_to_dname(labels)) do
       [] -> best_match(qname, labels, zone)
       matches -> matches
     end
@@ -419,7 +419,7 @@ defmodule Exdns.Resolver do
       [] -> message
       _ ->
         records =
-          Enum.map(record_names, fn(name) -> Exdns.ZoneCache.get_records_by_name(name) end) |>
+          Enum.map(record_names, fn(name) -> Exdns.Zone.Cache.get_records_by_name(name) end) |>
           List.flatten |>
           Enum.filter(Exdns.Records.match_types([:dns_terms_const.dns_type_a, :dns_terms_const.dns_type_aaaa]))
         case records do

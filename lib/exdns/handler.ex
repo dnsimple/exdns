@@ -89,7 +89,7 @@ defmodule Exdns.Handler do
   end
 
   defp get_authority(message_or_name) do
-    case Exdns.ZoneCache.get_authority(message_or_name) do
+    case Exdns.Zone.Cache.get_authority(message_or_name) do
       {:ok, authority} -> [authority]
       {:error, _} -> []
     end

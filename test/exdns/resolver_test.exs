@@ -9,7 +9,7 @@ defmodule Exdns.ResolverTest do
   end
 
   test "resolve with one question for type A" do
-    {:ok, zone} = Exdns.ZoneCache.get_zone("example.com")
+    {:ok, zone} = Exdns.Zone.Cache.get_zone("example.com")
     assert zone.authority != :undefined
     question = Exdns.Records.dns_query(name: "outpost.example.com", type: :dns_terms_const.dns_type_a)
     message = Exdns.Records.dns_message(questions: [question])
@@ -18,7 +18,7 @@ defmodule Exdns.ResolverTest do
   end
 
   test "resolve with one question for type CNAME" do
-    {:ok, zone} = Exdns.ZoneCache.get_zone("example.com")
+    {:ok, zone} = Exdns.Zone.Cache.get_zone("example.com")
     assert zone.authority != :undefined
     question = Exdns.Records.dns_query(name: "www.example.com", type: :dns_terms_const.dns_type_cname)
     message = Exdns.Records.dns_message(questions: [question])
@@ -27,7 +27,7 @@ defmodule Exdns.ResolverTest do
   end
 
   test "resolve with one question for type SOA" do
-    {:ok, zone} = Exdns.ZoneCache.get_zone("example.com")
+    {:ok, zone} = Exdns.Zone.Cache.get_zone("example.com")
     assert zone.authority != :undefined
     question = Exdns.Records.dns_query(name: "example.com", type: :dns_terms_const.dns_type_soa)
     message = Exdns.Records.dns_message(questions: [question])
@@ -61,7 +61,7 @@ defmodule Exdns.ResolverTest do
   end
 
   test "test any wildcard" do
-    {:ok, zone} = Exdns.ZoneCache.get_zone("wtest.com")
+    {:ok, zone} = Exdns.Zone.Cache.get_zone("wtest.com")
     assert zone.authority != :undefined
     question = Exdns.Records.dns_query(name: "fwejfiwerrfj.something.wtest.com", type: :dns_terms_const.dns_type_a)
     message = Exdns.Records.dns_message(questions: [question])
@@ -73,7 +73,7 @@ defmodule Exdns.ResolverTest do
   end
 
   test "cname and wildcard at root" do
-    {:ok, zone} = Exdns.ZoneCache.get_zone("wtest.com")
+    {:ok, zone} = Exdns.Zone.Cache.get_zone("wtest.com")
     assert zone.authority != :undefined
     question = Exdns.Records.dns_query(name: "secure.wtest.com", type: :dns_terms_const.dns_type_a)
     message = Exdns.Records.dns_message(questions: [question])
@@ -85,7 +85,7 @@ defmodule Exdns.ResolverTest do
   end
 
   test "cname and wildcard but no correct type" do
-    {:ok, zone} = Exdns.ZoneCache.get_zone("test.com")
+    {:ok, zone} = Exdns.Zone.Cache.get_zone("test.com")
     assert zone.authority != :undefined
     question = Exdns.Records.dns_query(name: "yo.test.test.com", type: :dns_terms_const.dns_type_aaaa)
     message = Exdns.Records.dns_message(questions: [question])
@@ -97,7 +97,7 @@ defmodule Exdns.ResolverTest do
   end
 
   test "same record only appears in answer set once" do
-    {:ok, zone} = Exdns.ZoneCache.get_zone("example.com")
+    {:ok, zone} = Exdns.Zone.Cache.get_zone("example.com")
     assert zone.authority != :undefined
     question = Exdns.Records.dns_query(name: "double.example.com", type: :dns_terms_const.dns_type_a)
     message = Exdns.Records.dns_message(questions: [question])

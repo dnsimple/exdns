@@ -1,4 +1,4 @@
-defmodule Exdns.ZoneParser do
+defmodule Exdns.Zone.Parser do
   require Logger
   require Exdns.Records
  
@@ -22,7 +22,7 @@ defmodule Exdns.ZoneParser do
       case apply_context_options(r) do
         :pass ->
           case json_record_to_rr(r) do
-            {} -> try_custom_parsers(r, Exdns.ZoneParser.Registry.get_all)
+            {} -> try_custom_parsers(r, Exdns.Zone.Parser.Registry.get_all)
             record -> record
           end
         _ ->
@@ -166,8 +166,8 @@ defmodule Exdns.ZoneParser do
   defp build_named_index([r|rest], index) do
     name = Exdns.Records.dns_rr(r, :name)
     case Map.get(index, name) do
-      nil -> build_named_index(rest, Map.put(index, Exdns.ZoneCache.normalize_name(name), [r]))
-      records -> build_named_index(rest, Map.put(index, Exdns.ZoneCache.normalize_name(name), records ++ [r]))
+      nil -> build_named_index(rest, Map.put(index, Exdns.Zone.Cache.normalize_name(name), [r]))
+      records -> build_named_index(rest, Map.put(index, Exdns.Zone.Cache.normalize_name(name), records ++ [r]))
     end
   end
 

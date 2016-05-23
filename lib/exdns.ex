@@ -12,7 +12,7 @@ defmodule Exdns do
 
   def start_phase(:post_start, _start_type, _phase_args) do
     Exdns.Events.add_handler(Exdns.Events, [])
-    Exdns.ZoneLoader.load_zones()
+    Exdns.Zone.Loader.load_zones()
     Exdns.Events.notify(:start_servers)
 
     :ok
