@@ -31,7 +31,6 @@ defmodule Exdns.ZoneCache do
     name = normalize_name(name)
     case :dns.dname_to_labels(name) do
       [] -> {:error, :zone_not_found}
-      [_] -> {:error, :zone_not_found}
       [_|labels] ->
         case get_zone(name) do
           {:ok, zone} -> zone
