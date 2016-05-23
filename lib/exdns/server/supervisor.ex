@@ -24,7 +24,7 @@ defmodule Exdns.Server.Supervisor do
 
   def init(_) do
     servers = Exdns.Config.servers
-    if servers == [], do: Logger.warn("No servers are specified in your config")
+    if servers == [] and Mix.env != :test, do: Logger.warn("No servers are specified in your config")
     Enum.map(servers, &define_server/1) |> supervise(strategy: :one_for_one)
   end
 
