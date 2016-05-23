@@ -11,12 +11,8 @@ defmodule Exdns.Config do
 
   def storage_type, do: Application.get_env(:exdns, :storage_type, Exdns.Storage.EtsStorage)
 
-  def get_port, do: Application.get_env(:exdns, :port, 53)
+  def num_workers, do: Application.get_env(:exdns, :num_workers, 16)
 
-  def get_num_workers, do: Application.get_env(:exdns, :num_workers, 16)
+  def servers, do: Application.get_env(:exdns, :servers, [])
 
-  def get_address(:inet), do: {127, 0, 0, 1}
-  def get_address(:inet6), do: {0, 0, 0, 0, 0, 0, 0, 1}
-
-  def get_servers, do: []
 end

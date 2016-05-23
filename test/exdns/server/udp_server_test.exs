@@ -2,18 +2,21 @@ defmodule Exdns.Server.UdpServerTest do
   use ExUnit.Case, async: false
   require Exdns.Records
 
+  @localhost {127,0,0,1}
+  @localhost6 {0,0,0,0,0,0,0,1}
+
   test "server start" do 
-    assert Exdns.Server.UdpServer.start_link(:test, :inet, Exdns.Config.get_address(:inet), 12345)
+    assert Exdns.Server.UdpServer.start_link(:test, :inet, @localhost, 12345)
     Exdns.Server.UdpServer.stop(:test)
   end
 
   test "server start with inet6" do
-    assert Exdns.Server.UdpServer.start_link(:test, :inet6, Exdns.Config.get_address(:inet6), 12345)
+    assert Exdns.Server.UdpServer.start_link(:test, :inet6, @localhost6, 12345)
     Exdns.Server.UdpServer.stop(:test)
   end
 
   test "handle timeout message" do
-    {:ok, server} = Exdns.Server.UdpServer.start_link(:test, :inet, {127,0,0,1}, 12346)
+    {:ok, server} = Exdns.Server.UdpServer.start_link(:test, :inet, @localhost, 12346)
     assert send(server, :timeout)
     Exdns.Server.UdpServer.stop(:test)
   end

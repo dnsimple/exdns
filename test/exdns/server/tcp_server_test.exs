@@ -3,12 +3,12 @@ defmodule Exdns.Server.TcpServerTest do
   require Exdns.Records
 
   test "server start" do
-    assert Exdns.Server.TcpServer.start_link(:test, :inet, Exdns.Config.get_address(:inet), 12345)
+    assert Exdns.Server.TcpServer.start_link(:test, :inet, {127,0,0,1}, 12345)
     Exdns.Server.TcpServer.stop(:test)
   end
 
   test "server start with inet6" do
-    assert Exdns.Server.TcpServer.start_link(:test, :inet, Exdns.Config.get_address(:inet), 12345)
+    assert Exdns.Server.TcpServer.start_link(:test, :inet, {0,0,0,0,0,0,0,1}, 12345)
     Exdns.Server.TcpServer.stop(:test)
   end
 

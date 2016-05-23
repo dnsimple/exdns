@@ -23,19 +23,11 @@ defmodule Exdns.ConfigTest do
     assert Exdns.Config.storage_type == Exdns.Storage.EtsStorage
   end
 
-  test "get port" do
-    assert Exdns.Config.get_port == 8053
+  test "number of workers" do
+    assert Exdns.Config.num_workers == 16
   end
 
-  test "get address for IPv4" do
-    assert Exdns.Config.get_address(:inet) == {127, 0, 0, 1}
-  end
-
-  test "get address for IPv6" do
-    assert Exdns.Config.get_address(:inet6) == {0, 0, 0, 0, 0, 0, 0, 1}
-  end
-
-  test "get number of workers" do
-    assert Exdns.Config.get_num_workers == 16
+  test "servers" do
+    assert Exdns.Config.servers == []
   end
 end

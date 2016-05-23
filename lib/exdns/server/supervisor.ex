@@ -23,15 +23,15 @@ defmodule Exdns.Server.Supervisor do
   end
 
   def init(_) do
-    supervise(define_servers(Exdns.Config.get_servers()), strategy: :one_for_one)
+    servers = Exdns.Config.servers
+    if servers == [], do: Logger.warn("No servers are specified in your config")
+    Enum.map(servers, &define_server/1) |> supervise(strategy: :one_for_one)
   end
 
-  def define_servers([]) do
-    [
-      worker(Exdns.Server.UdpServer, [:udp_inet, :inet, Exdns.Config.get_address(:inet), Exdns.Config.get_port()], id: :udp_inet, restart: :permanent, timeout: 5000),
-      worker(Exdns.Server.UdpServer, [:udp_inet6, :inet6, Exdns.Config.get_address(:inet6), Exdns.Config.get_port()], id: :udp_inet6, restart: :permanent, timeout: 5000),
-      worker(Exdns.Server.TcpServer, [:tcp_inet, :inet, Exdns.Config.get_address(:inet), Exdns.Config.get_port()], id: :tcp_inet, restart: :permanent, timeout: 5000),
-      worker(Exdns.Server.TcpServer, [:tcp_inet6, :inet6, Exdns.Config.get_address(:inet6), Exdns.Config.get_port()], id: :tcp_inet6, restart: :permanent, timeout: 5000)
-    ]
+  def define_server(server = %{name: name, type: type, address: raw_ip, port: port, family: family}) do
+    case :inet_parse.address(to_char_list(raw_ip)) do
+      {:ok, address} -> worker(type, [name, family, address, port], id: name, restart: :permanent, timeout: 5000)
+      {:error, reason} -> raise ArgumentError, reason
+    end
   end
 end

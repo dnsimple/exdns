@@ -21,7 +21,11 @@ defmodule Exdns.Server.TcpServer do
     {:ok, %{workers: Exdns.Worker.make_workers(:queue.new())}}
   end
 
-  def handle_call(message, _from, state) do
+  def handle_call(_message, _from, state) do
+    {:reply, :ok, state}
+  end
+
+  def handle_cast(_message, state) do
     {:noreply, state}
   end
 
@@ -31,7 +35,7 @@ defmodule Exdns.Server.TcpServer do
     {:noreply, state}
   end
 
-  def handle_info(message, state) do
+  def handle_info(_message, state) do
     {:noreply, state}
   end
 
