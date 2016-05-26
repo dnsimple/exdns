@@ -7,6 +7,8 @@ defmodule Exdns.Mixfile do
      elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     description: description,
+     package: package,
      deps: deps]
   end
 
@@ -30,7 +32,27 @@ defmodule Exdns.Mixfile do
     [
       {:folsom, "~> 0.8.3"},
       {:exjsx, "~>3.2.0"},
-      {:dns_erlang, git: "https://github.com/aetrion/dns_erlang.git", app: false}
+      {:dns_erlang, git: "https://github.com/aetrion/dns_erlang.git", app: false},
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:earmark, ">= 0.0.0", only: :dev}
+    ]
+  end
+
+  defp description do
+    """
+    exdns is an authoritative name server. It is ported from erldns and adapted to the Elixir language.
+    """
+  end
+
+  defp package do
+    [
+      name: :exdns,
+      maintainers: ["Anthony Eden"],
+      licenses: ["MIT License"],
+      links: %{
+        "GitHub" => "https://github.com/dnsimple/exdns"
+        "Documentation" => "https://hexdocs.pm/exdns/0.0.1"
+      }
     ]
   end
 end
