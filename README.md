@@ -2,6 +2,8 @@
 
 A port of erldns (https://github.com/aetrion/erl-dns) to Elixir.
 
+*NOTE*: This application is in the very early stages of development. It passes all of the tests currently defined in https://github.com/dnsimple/dnstest however it is not on parity with erl-dns functionality yet.
+
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
