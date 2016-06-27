@@ -50,7 +50,7 @@ defmodule Exdns.Mixfile do
       maintainers: ["Anthony Eden"],
       licenses: ["MIT License"],
       links: %{
-        "GitHub" => "https://github.com/dnsimple/exdns"
+        "GitHub" => "https://github.com/dnsimple/exdns",
         "Documentation" => "https://hexdocs.pm/exdns/0.0.1"
       }
     ]
