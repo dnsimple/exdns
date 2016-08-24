@@ -71,8 +71,12 @@ defmodule Exdns.Zone.CacheTest do
     assert Exdns.Zone.Cache.find_zone_in_cache("notfound.com") == {:error, :zone_not_found}
   end
 
-
   test "normalize name" do
     assert Exdns.Zone.Cache.normalize_name("eXaMpLe.CoM") == "example.com"
+  end
+
+  test "fallback to wildcard zone when configured" do
+    Application.put_env(:exdns, :wildcard_fallback, true)
+    {:ok, _zone} = Exdns.Zone.Cache.find_zone_in_cache("notfound.com")
   end
 end
