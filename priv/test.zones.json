@@ -1664,6 +1664,33 @@
           }
         }
       ]
+    },
+    {
+      "name": "*",
+      "records": [
+      {
+        "name": "*",
+        "type": "SOA",
+        "data": {
+          "mname": "ns1.example.com",
+          "rname": "ahu.example.com",
+          "serial": 2000081501,
+          "refresh": 28800,
+          "retry": 7200,
+          "expire": 604800,
+          "minimum": 86400
+        },
+        "ttl": 100000
+      },
+      {
+        "name": "*",
+        "type": "A",
+        "ttl": 120,
+        "data": {
+          "ip": "1.2.3.4"
+        }
+      }
+      ]
     }
 ]
 
