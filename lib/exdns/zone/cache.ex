@@ -145,7 +145,7 @@ defmodule Exdns.Zone.Cache do
   end
   def find_zone_in_cache(name, [_|labels]) do
     case Exdns.Storage.select(:zones, name) do
-      [{name, zone}] -> {:ok, zone}
+      [{_name, zone}] -> {:ok, zone}
       _ ->
         case labels do
           [] -> get_wildcard_zone
