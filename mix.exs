@@ -3,7 +3,7 @@ defmodule Exdns.Mixfile do
 
   def project do
     [app: :exdns,
-     version: "0.0.1",
+     version: "0.0.2",
      elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -31,7 +31,7 @@ defmodule Exdns.Mixfile do
   defp deps do
     [
       {:folsom, "~> 0.8.3"},
-      {:exjsx, "~>3.2.0"},
+      {:exjsx, "~> 3.2.0"},
       {:dns_erlang, git: "https://github.com/aetrion/dns_erlang.git", app: false},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:earmark, ">= 0.0.0", only: :dev}
@@ -51,7 +51,7 @@ defmodule Exdns.Mixfile do
       licenses: ["MIT License"],
       links: %{
         "GitHub" => "https://github.com/dnsimple/exdns",
-        "Documentation" => "https://hexdocs.pm/exdns/0.0.1"
+        "Documentation" => "https://hexdocs.pm/exdns/0.0.2"
       }
     ]
   end
