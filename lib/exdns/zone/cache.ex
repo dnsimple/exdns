@@ -59,7 +59,7 @@ defmodule Exdns.Zone.Cache do
   end
 
   defp get_wildcard_zone do
-    if Exdns.Config.wildcard_fallback do
+    if Exdns.Config.wildcard_fallback? do
       case Exdns.Storage.select(:zones, "*") do
         [{"*", zone}] -> {:ok, zone}
         _ -> {:error, :zone_not_found}

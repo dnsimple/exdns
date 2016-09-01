@@ -30,4 +30,8 @@ defmodule Exdns.ConfigTest do
   test "servers" do
     assert Exdns.Config.servers == []
   end
+
+  test "wildcard fallback" do
+    assert !Exdns.Config.wildcard_fallback?
+  end
 end
