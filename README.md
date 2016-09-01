@@ -1,5 +1,7 @@
 # Exdns
 
+[![Build Status](https://api.travis-ci.org/dnsimple/exdns.svg?branch=master)](https://travis-ci.org/dnsimple/exdns/)
+
 A port of erldns (https://github.com/aetrion/erl-dns) to Elixir.
 
 *NOTE*: This application is in the very early stages of development. It passes all of the tests currently defined in https://github.com/dnsimple/dnstest however it is not on parity with erl-dns functionality yet.
