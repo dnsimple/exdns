@@ -383,7 +383,7 @@ defmodule Exdns.Resolver do
 
   def custom_lookup(qname, qtype, records) do
     fn({module, types}) ->
-      if Lists.member?(types, qtype) || qtype == :dns_terms_const.dns_type_any  do
+      if Enum.member?(types, qtype) || qtype == :dns_terms_const.dns_type_any  do
         module.handle(qname, qtype, records)
       else
         []
