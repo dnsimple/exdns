@@ -22,7 +22,7 @@ defmodule Exdns.Zone.Parser do
       case apply_context_options(r) do
         :pass ->
           case json_record_to_rr(r) do
-            {} -> try_custom_parsers(r, Exdns.Zone.Parser.Registry.get_all)
+            {} -> try_custom_parsers(r, Exdns.Zone.Registry.get_all)
             record -> record
           end
         _ ->
