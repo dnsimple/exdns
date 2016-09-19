@@ -140,12 +140,12 @@ defmodule Exdns.Resolver do
 
 
   # We are authoritative and there are no NS records here
-  def resolve_exact_type_match(message, qname, qtype, host, cname_chain, matched_records, zone, authority_records, []) do
+  def resolve_exact_type_match(message, _qname, _qtype, _host, _cname_chain, matched_records, _zone, _authority_records, []) do
     Logger.debug("Resolved exact type match and there are no NS records: #{inspect matched_records}")
     Exdns.Records.dns_message(message, aa: true, rc: :dns_terms_const.dns_rcode_noerror, answers: merge_with_answers(message, matched_records))
   end
   # We are authoritative and there are NS records here
-  def resolve_exact_type_match(message, qname, qtype, host, cname_chain, matched_records, zone, authority_records, ns_records) do
+  def resolve_exact_type_match(message, _qname, qtype, host, cname_chain, matched_records, zone, _authority_records, ns_records) do
     Logger.debug("Resolved exact type match and there are NS records")
     # NOTE: there is a potential bug here because it assumes the last record is the one to examine
     answer = List.last(matched_records)
@@ -174,7 +174,7 @@ defmodule Exdns.Resolver do
   end
 
 
-  def resolve_no_exact_type_match(message, qtype, host, cname_chain, exact_type_matches, zone, matched_records, referral_records, authority_records) do
+  def resolve_no_exact_type_match(message, qtype, _host, _cname_chain, exact_type_matches, zone, matched_records, referral_records, authority_records) do
     any_type = :dns_terms_const.dns_type_any
     case qtype do
       ^any_type -> Exdns.Records.dns_message(message, aa: true, authority: authority_records)
@@ -190,7 +190,7 @@ defmodule Exdns.Resolver do
 
   # Given an exact name match where the qtype is not found in the record set, and we are not authoritative,
   # add the NS records to the authority section of the message.
-  def resolve_exact_match_referral(message, qtype, matched_records, referral_records, []) do
+  def resolve_exact_match_referral(message, _qtype, _matched_records, referral_records, []) do
     Exdns.Records.dns_message(message, authority: merge_with_authority(message, referral_records))
   end
   def resolve_exact_match_referral(message, qtype, matched_records, referral_records, authority_records) do
@@ -207,7 +207,7 @@ defmodule Exdns.Resolver do
   end
 
 
-  def resolve_exact_match_with_cname(message, qtype, host, cname_chain, matched_records, zone, cname_records) do
+  def resolve_exact_match_with_cname(message, qtype, host, cname_chain, _matched_records, zone, cname_records) do
     cname_type = :dns_terms_const.dns_type_cname
     case qtype do
       ^cname_type ->
@@ -312,15 +312,15 @@ defmodule Exdns.Resolver do
         resolve_best_match_with_wildcard_cname(message, qname, qtype, host, cname_chain, matched_records, zone, cname_records)
     end
   end
-  def resolve_best_match_with_wildcard(message, qname, qtype, host, cname_chain, best_match_records, zone, [], []) do
+  def resolve_best_match_with_wildcard(message, _qname, _qtype, _host, _cname_chain, _best_match_records, zone, [], []) do
     Exdns.Records.dns_message(message, aa: true, authority: [zone.authority])
   end
-  def resolve_best_match_with_wildcard(message, qname, qtype, host, cname_chain, best_match_records, zone, [], type_matches) do
+  def resolve_best_match_with_wildcard(message, _qname, _qtype, _host, _cname_chain, _best_match_records, _zone, [], type_matches) do
     Exdns.Records.dns_message(message, aa: true, answers: merge_with_answers(message, type_matches))
   end
 
 
-  def resolve_best_match_with_wildcard_cname(message, qname, qtype, host, cname_chain, best_match_records, zone, cname_records) do
+  def resolve_best_match_with_wildcard_cname(message, _qname, qtype, host, cname_chain, _best_match_records, zone, cname_records) do
     cname_type = :dns_terms_const.dns_type_cname
     case qtype do
       ^cname_type ->
@@ -343,7 +343,7 @@ defmodule Exdns.Resolver do
   #
   # If there are no SOA records present then we indicate we are not authoritivate for the name.
   # If there is an SOA record then we authoritative for the name
-  def resolve_best_match_referral(message, qname, qtype, host, cname_chain, best_match_records, zone, referral_records) do
+  def resolve_best_match_referral(message, _qname, qtype, _host, cname_chain, best_match_records, _zone, referral_records) do
     authority = Enum.filter(best_match_records, Exdns.Records.match_type(:dns_terms_const.dns_type_soa))
     any_type = :dns_terms_const.dns_type_any
     case {qtype, cname_chain, authority} do
@@ -413,7 +413,7 @@ defmodule Exdns.Resolver do
 
 
   def additional_processing(message, _host, {:error, _}), do: message
-  def additional_processing(message, host, zone) do
+  def additional_processing(message, _host, _zone) do
     record_names = merge_with_answers(message, Exdns.Records.dns_message(message, :authority)) |> requires_additional_processing([]) |> List.flatten
     case record_names do
       [] -> message

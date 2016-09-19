@@ -35,7 +35,7 @@ defmodule Exdns.Handler.Registry do
     {:reply, handlers, handlers}
   end
 
-  def handle_call(:clear, _, handlers) do
+  def handle_call(:clear, _, _handlers) do
     {:reply, :ok, []}
   end
 end

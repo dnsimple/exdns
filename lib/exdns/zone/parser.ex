@@ -41,9 +41,9 @@ defmodule Exdns.Zone.Parser do
     }
   end
 
-  def apply_context_options(record = %{"context" => context}) do
+  def apply_context_options(_record = %{"context" => context}) do
     case Application.get_env(:exdns, :context_options) do
-      {:ok, context_options} ->
+      {:ok, _context_options} ->
         context_set = Set.from_list(context)
         result = [] # TODO implement
         if Enum.any?(result, fn(i) -> i == :pass end) do
@@ -57,7 +57,7 @@ defmodule Exdns.Zone.Parser do
   end
   def apply_context_options(_), do: :pass
 
-  def try_custom_parsers(record, []), do: {}
+  def try_custom_parsers(_record, []), do: {}
   def try_custom_parsers(record, [parser|rest]) do
     case parser.json_record_to_rr(record) do
       {} -> try_custom_parsers(record, rest)

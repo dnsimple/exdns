@@ -70,7 +70,7 @@ defmodule Exdns.Worker do
     end
   end
 
-  def handle_tcp_dns_query(socket, bad_packet) do
+  def handle_tcp_dns_query(socket, _bad_packet) do
     :gen_tcp.close(socket)
   end
 
