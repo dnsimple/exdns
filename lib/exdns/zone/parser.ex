@@ -44,7 +44,7 @@ defmodule Exdns.Zone.Parser do
   def apply_context_options(_record = %{"context" => context}) do
     case Application.get_env(:exdns, :context_options) do
       {:ok, _context_options} ->
-        context_set = Set.from_list(context)
+        context_set = MapSet.new(context)
         result = [] # TODO implement
         if Enum.any?(result, fn(i) -> i == :pass end) do
           :pass
