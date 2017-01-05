@@ -15,7 +15,7 @@ defmodule Exdns.Handler do
   def handle(message, context = {_, host}) when Record.is_record(message, :dns_message) do
     handle(message, host, Exdns.QueryThrottle.throttle(message, context))
   end
-  def handle(bad_message, {_, host}) do
+  def handle(bad_message, {_, _host}) do
     bad_message
   end
 
@@ -69,7 +69,7 @@ defmodule Exdns.Handler do
         message = Exdns.Resolver.resolve(message, authority, host)
         maybe_cache_packet(message, Exdns.Records.dns_message(message, :aa))
       rescue
-        exception ->
+        _exception ->
           # Logger.error("Error answering request: #{inspect exception}")
           Exdns.Records.dns_message(message, aa: false, rc: :dns_terms_const.dns_rcode_servfail)
       end

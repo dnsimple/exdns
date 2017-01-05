@@ -6,12 +6,12 @@ defmodule Exdns.Server.TcpServer do
 
   require Logger
 
-  def start_link(name, inet_family, address, port) do
+  def start_link(_name, inet_family, address, port) do
     Logger.debug("Starting TCP server for #{inet_family} on address #{inspect address} port #{port}")
     :gen_nb_server.start_link(__MODULE__, address, port, [])
   end
 
-  def stop(name) do
+  def stop(_name) do
 
   end
 
@@ -29,8 +29,8 @@ defmodule Exdns.Server.TcpServer do
     {:noreply, state}
   end
 
-  def handle_info(msg = {:tcp, socket, bin}, state) do
-    response = :folsom_metrics.histogram_timed_update(:tcp_handoff_histogram, Exdns.Server.TcpServer, :handle_request, [socket, bin, state])
+  def handle_info(_msg = {:tcp, socket, bin}, state) do
+    _response = :folsom_metrics.histogram_timed_update(:tcp_handoff_histogram, Exdns.Server.TcpServer, :handle_request, [socket, bin, state])
     :inet.setopts(socket, [{:active, :once}])
     {:noreply, state}
   end
@@ -39,7 +39,7 @@ defmodule Exdns.Server.TcpServer do
     {:noreply, state}
   end
 
-  def terminate(_reason, state) do
+  def terminate(_reason, _state) do
     :ok
   end
 
