@@ -122,7 +122,7 @@ defmodule Exdns.Resolver do
         answer = List.last(matched_records)
         case ns_records = Exdns.Zone.Cache.get_delegations(Exdns.Records.dns_rr(answer, :name)) do
           [] ->
-            resolve_exact_type_match(message, qname, qtype, host, cname_chain, matched_records, zone, authority_records, ns_records = [])
+            resolve_exact_type_match(message, qname, qtype, host, cname_chain, matched_records, zone, authority_records, _ns_records = [])
           _ ->
             ns_record = List.last(ns_records)
             case Exdns.Zone.Cache.get_authority(qname) do

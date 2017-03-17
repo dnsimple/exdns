@@ -47,12 +47,12 @@ defmodule Exdns.Zone.Cache do
     name = normalize_name(name)
     case Exdns.Storage.select(:zones, name) do
       [{^name, zone}] -> {:ok, %{zone | records: [], records_by_name: :trimmed}}
-      _ -> get_fallback
+      _ -> get_fallback()
     end
   end
 
   defp get_fallback do
-    case get_wildcard_zone do
+    case get_wildcard_zone() do
       {:ok, zone} -> {:ok, %{zone | records: [], records_by_name: :trimmed}}
       _ -> {:error, :zone_not_found}
     end
@@ -141,14 +141,14 @@ defmodule Exdns.Zone.Cache do
     find_zone_in_cache(normalize_name(name), :dns.dname_to_labels(name))
   end
   def find_zone_in_cache(_name, []) do
-    get_wildcard_zone
+    get_wildcard_zone()
   end
   def find_zone_in_cache(name, [_|labels]) do
     case Exdns.Storage.select(:zones, name) do
       [{_name, zone}] -> {:ok, zone}
       _ ->
         case labels do
-          [] -> get_wildcard_zone
+          [] -> get_wildcard_zone()
           _ -> find_zone_in_cache(:dns.labels_to_dname(labels), labels)
         end
     end

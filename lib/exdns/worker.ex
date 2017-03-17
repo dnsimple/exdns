@@ -48,7 +48,7 @@ defmodule Exdns.Worker do
       {:ok, {address, _port}} ->
         Exdns.Events.notify({:start_tcp, [{:host, address}]})
 
-        result = case bin do
+        _result = case bin do
           <<>> -> :ok
           _ ->
             case Exdns.Decoder.decode_message(bin) do
