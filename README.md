@@ -24,6 +24,8 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
 ## Running locally
 
+Install dependencies with `mix deps.get`
+
 Run with `mix run --no-halt`
 
 Note that to run in production you will need to set up a production configuration
