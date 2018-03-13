@@ -1,24 +1,24 @@
-defmodule Exdns.Zone.Registry do
+defmodule ExDNS.Zone.Registry do
   @moduledoc """
   Registry for custom zone parsers. 
   """
 
   use GenServer
 
-  def start_link do
-    GenServer.start_link(__MODULE__, [], name: Exdns.Zone.Registry)
+  def start_link([]) do
+    GenServer.start_link(__MODULE__, [], name: ExDNS.Zone.Registry)
   end
 
   def register(modules) do
-    GenServer.call(Exdns.Zone.Registry, {:register, modules})
+    GenServer.call(ExDNS.Zone.Registry, {:register, modules})
   end
 
   def get_all do
-    GenServer.call(Exdns.Zone.Registry, :get_all)
+    GenServer.call(ExDNS.Zone.Registry, :get_all)
   end
 
   def clear do
-    GenServer.call(Exdns.Zone.Registry, :clear)
+    GenServer.call(ExDNS.Zone.Registry, :clear)
   end
 
   ## Server callbacks

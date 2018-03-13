@@ -1,4 +1,4 @@
-defmodule Exdns.Server.TcpServer do
+defmodule ExDNS.Server.TCPServer do
   @moduledoc """
   Server for receiving TCP packets.
   """
@@ -18,7 +18,7 @@ defmodule Exdns.Server.TcpServer do
   # GenServer callbacks
 
   def init([]) do
-    {:ok, %{workers: Exdns.Worker.make_workers(:queue.new())}}
+    {:ok, %{workers: ExDNS.Worker.make_workers(:queue.new())}}
   end
 
   def handle_call(_message, _from, state) do
@@ -30,7 +30,7 @@ defmodule Exdns.Server.TcpServer do
   end
 
   def handle_info(_msg = {:tcp, socket, bin}, state) do
-    _response = :folsom_metrics.histogram_timed_update(:tcp_handoff_histogram, Exdns.Server.TcpServer, :handle_request, [socket, bin, state])
+    _response = :folsom_metrics.histogram_timed_update(:tcp_handoff_histogram, ExDNS.Server.TCPServer, :handle_request, [socket, bin, state])
     :inet.setopts(socket, [{:active, :once}])
     {:noreply, state}
   end

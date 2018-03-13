@@ -1,4 +1,4 @@
-defmodule Exdns.Decoder do
+defmodule ExDNS.Decoder do
   @moduledoc """
   Functions used to decode DNS messages safely.
   """
@@ -7,7 +7,7 @@ defmodule Exdns.Decoder do
 
   @spec decode_message(:dns.message_bin()) :: {:dns.decode_error(), :dns.message() | :undefined, binary()} | :dns.message()
   def decode_message(bin) do
-    if Exdns.Config.catch_exceptions? do
+    if ExDNS.Config.catch_exceptions? do
       try do
         :dns.decode_message(bin)
       catch

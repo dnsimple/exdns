@@ -1,4 +1,4 @@
-defmodule Exdns.Storage do
+defmodule ExDNS.Storage do
   @moduledoc """
   Interface for storage engines.
   """
@@ -52,6 +52,6 @@ defmodule Exdns.Storage do
   # Private functions
 
   defp mod() do
-    Exdns.Config.storage_type()
+    ExDNS.Config.storage_type()
   end
 end

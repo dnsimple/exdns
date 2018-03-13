@@ -1,4 +1,4 @@
-defmodule Exdns.PacketCache do
+defmodule ExDNS.PacketCache do
   @moduledoc """
   Short-lived packet cache for faster responses of questions that were recently answered.
   """
@@ -9,8 +9,8 @@ defmodule Exdns.PacketCache do
   @default_ttl 20
   @sweep_interval 1000 * 60 * 3 # Every 3 minutes
 
-  def start_link() do
-    GenServer.start_link(__MODULE__, [], name: Exdns.PacketCache)
+  def start_link([]) do
+    GenServer.start_link(__MODULE__, [], name: ExDNS.PacketCache)
   end
 
   def get(question) do
@@ -18,9 +18,9 @@ defmodule Exdns.PacketCache do
   end
 
   def get(question, _host) do
-    case Exdns.Storage.select(:packet_cache, question) do
+    case ExDNS.Storage.select(:packet_cache, question) do
       [{^question, {response, expires_at}}] ->
-        if Exdns.timestamp() > expires_at do
+        if ExDNS.timestamp() > expires_at do
           :folsom_metrics.notify(:cache_expired_meter, 1)
           {:error, :cache_expired}
         else
@@ -35,22 +35,22 @@ defmodule Exdns.PacketCache do
 
   def put(question, message) do
     if @enabled do
-      GenServer.call(Exdns.PacketCache, {:set_packet, [question, message]})
+      GenServer.call(ExDNS.PacketCache, {:set_packet, [question, message]})
     else
       :ok
     end
   end
 
   def sweep() do
-    GenServer.call(Exdns.PacketCache, :sweep)
+    GenServer.call(ExDNS.PacketCache, :sweep)
   end
 
   def clear() do
-    GenServer.call(Exdns.PacketCache, :clear)
+    GenServer.call(ExDNS.PacketCache, :clear)
   end
 
   def stop() do
-    GenServer.call(Exdns.PacketCache, :stop)
+    GenServer.call(ExDNS.PacketCache, :stop)
   end
 
   # Server callbacks
@@ -60,24 +60,24 @@ defmodule Exdns.PacketCache do
   end
 
   def init([ttl]) do
-    Exdns.Storage.create(:packet_cache)
-    {:ok, tref} = :timer.apply_interval(@sweep_interval, Exdns.PacketCache, :sweep, [])
+    ExDNS.Storage.create(:packet_cache)
+    {:ok, tref} = :timer.apply_interval(@sweep_interval, ExDNS.PacketCache, :sweep, [])
     {:ok, %{ttl: ttl, tref: tref}}
   end
 
   def handle_call({:set_packet, [question, response]}, _from, state) do
-    Exdns.Storage.insert(:packet_cache, {question, {response, Exdns.timestamp() + Map.get(state, :ttl)}})
+    ExDNS.Storage.insert(:packet_cache, {question, {response, ExDNS.timestamp() + Map.get(state, :ttl)}})
     {:reply, :ok, state}
   end
 
   def handle_call(:clear, _from, state) do
-    Exdns.Storage.empty_table(:packet_cache)
+    ExDNS.Storage.empty_table(:packet_cache)
     {:reply, :ok, state}
   end
 
   def handle_call(:sweep, _from, state) do
-    Exdns.Storage.select(:packet_cache, [{{:"$1", {:"_", :"$2"}}, [{:<, :"$2", Exdns.timestamp() - 10}], [:"$1"]}], :infinite) |>
-      Enum.each(fn(k) -> Exdns.Storage.delete(:packet_cache, k) end)
+    ExDNS.Storage.select(:packet_cache, [{{:"$1", {:"_", :"$2"}}, [{:<, :"$2", ExDNS.timestamp() - 10}], [:"$1"]}], :infinite) |>
+      Enum.each(fn(k) -> ExDNS.Storage.delete(:packet_cache, k) end)
     {:reply, :ok, state}
   end
 

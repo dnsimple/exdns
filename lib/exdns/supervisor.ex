@@ -1,23 +1,23 @@
-defmodule Exdns.Supervisor do
+defmodule ExDNS.Supervisor do
   @moduledoc """
-  Exdns application supervisor
+  ExDNS application supervisor
   """
 
   use Supervisor
 
-  def start_link do
-    Supervisor.start_link(__MODULE__, :ok, name: Exdns.Supervisor)
+  def start_link() do
+    Supervisor.start_link(__MODULE__, :ok, name: ExDNS.Supervisor)
   end
 
   def init(_args) do
     children = [
-      worker(Exdns.Events, []),
-      worker(Exdns.Zone.Cache, []),
-      worker(Exdns.Zone.Registry, []),
-      # worker(Exdns.ZoneEncoder, []),
-      worker(Exdns.PacketCache, []),
-      worker(Exdns.QueryThrottle, []),
-      worker(Exdns.Handler.Registry, [])
+      worker(ExDNS.Events, []),
+      worker(ExDNS.Zone.Cache, []),
+      worker(ExDNS.Zone.Registry, []),
+      # worker(ExDNS.ZoneEncoder, []),
+      worker(ExDNS.PacketCache, []),
+      worker(ExDNS.QueryThrottle, []),
+      worker(ExDNS.Handler.Registry, [])
     ]
 
     supervise(children, strategy: :one_for_one)

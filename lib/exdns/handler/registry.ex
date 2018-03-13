@@ -1,24 +1,24 @@
-defmodule Exdns.Handler.Registry do
+defmodule ExDNS.Handler.Registry do
   @moduledoc """
   Registry for custom handlers. 
   """
 
   use GenServer
 
-  def start_link do
-    GenServer.start_link(__MODULE__, [], name: Exdns.Handler.Registry)
+  def start_link([]) do
+    GenServer.start_link(__MODULE__, [], name: ExDNS.Handler.Registry)
   end
 
   def register_handler(record_types, module) do
-    GenServer.call(Exdns.Handler.Registry, {:register_handler, record_types, module})
+    GenServer.call(ExDNS.Handler.Registry, {:register_handler, record_types, module})
   end
 
   def get_handlers do
-    GenServer.call(Exdns.Handler.Registry, {:get_handlers})
+    GenServer.call(ExDNS.Handler.Registry, {:get_handlers})
   end
 
   def clear do
-    GenServer.call(Exdns.Handler.Registry, :clear)
+    GenServer.call(ExDNS.Handler.Registry, :clear)
   end
 
   ## Server callbacks

@@ -1,4 +1,4 @@
-defmodule Exdns.Worker do
+defmodule ExDNS.Worker do
   @moduledoc """
   Servers hand off requests to workers for processing, freeing up server processes
   so they can continue receiving data from the network.
@@ -6,7 +6,7 @@ defmodule Exdns.Worker do
 
   use GenServer
   require Record
-  require Exdns.Records
+  require ExDNS.Records
 
   @max_packet_size 512
 
@@ -14,11 +14,11 @@ defmodule Exdns.Worker do
     GenServer.start_link(__MODULE__, []) 
   end
 
-  def make_workers(queue), do: make_workers(queue, Exdns.Config.num_workers)
+  def make_workers(queue), do: make_workers(queue, ExDNS.Config.num_workers)
   def make_workers(queue, num_workers), do: make_workers(queue, num_workers, 1)
   def make_workers(queue, num_workers, n) do
     if n < num_workers do
-      {:ok, worker_pid} = Exdns.Worker.start_link([])
+      {:ok, worker_pid} = ExDNS.Worker.start_link([])
       make_workers(:queue.in(worker_pid, queue), num_workers, n + 1)
     else
       queue
@@ -46,12 +46,12 @@ defmodule Exdns.Worker do
   def handle_tcp_dns_query(socket, <<_len::16, bin::binary>>) do
     case :inet.peername(socket) do
       {:ok, {address, _port}} ->
-        Exdns.Events.notify({:start_tcp, [{:host, address}]})
+        ExDNS.Events.notify({:start_tcp, [{:host, address}]})
 
         _result = case bin do
           <<>> -> :ok
           _ ->
-            case Exdns.Decoder.decode_message(bin) do
+            case ExDNS.Decoder.decode_message(bin) do
               {:truncated, _, _} ->
                 :ok
               {:trailing_garbage, decoded_message, _} ->
@@ -63,10 +63,10 @@ defmodule Exdns.Worker do
             end
         end
 
-        Exdns.Events.notify({:end_tcp, [{:host, address}]})
+        ExDNS.Events.notify({:end_tcp, [{:host, address}]})
         :gen_tcp.close(socket)
       {:error, reason} ->
-        Exdns.Events.notify({:tcp_error, reason})
+        ExDNS.Events.notify({:tcp_error, reason})
     end
   end
 
@@ -75,10 +75,10 @@ defmodule Exdns.Worker do
   end
 
   def handle_decoded_tcp_message(decoded_message, socket, address) do
-    Exdns.Events.notify({:start_handle, :tcp, [{:host, address}]})
-    response = Exdns.Handler.handle(decoded_message, {:tcp, address})
-    Exdns.Events.notify({:end_handle, :tcp, [{:host, address}]})
-    case Exdns.Encoder.encode_message(response) do
+    ExDNS.Events.notify({:start_handle, :tcp, [{:host, address}]})
+    response = ExDNS.Handler.handle(decoded_message, {:tcp, address})
+    ExDNS.Events.notify({:end_handle, :tcp, [{:host, address}]})
+    case ExDNS.Encoder.encode_message(response) do
       {false, encoded_message} -> send_tcp_message(socket, encoded_message)
       {true, encoded_message, _message} -> send_tcp_message(socket, encoded_message)
       {false, encoded_message, _tsig_mac} -> send_tcp_message(socket, encoded_message)
@@ -96,9 +96,9 @@ defmodule Exdns.Worker do
 
   @spec handle_udp_dns_query(:gen_udp.socket(), :gen_udp.ip(), :inet.port_number(), binary()) :: :ok
   def handle_udp_dns_query(socket, host, port, bin) do
-    Exdns.Events.notify({:start_udp, [{:host, host}]})
+    ExDNS.Events.notify({:start_udp, [{:host, host}]})
 
-    case Exdns.Decoder.decode_message(bin) do
+    case ExDNS.Decoder.decode_message(bin) do
       {:trailing_garbage, decoded_message, _} ->
         handle_decoded_udp_message(decoded_message, socket, host, port)
       {_error, _, _} ->
@@ -107,21 +107,21 @@ defmodule Exdns.Worker do
         handle_decoded_udp_message(decoded_message, socket, host, port)
     end
 
-    Exdns.Events.notify({:end_udp, [{:host, host}]})
+    ExDNS.Events.notify({:end_udp, [{:host, host}]})
     :ok
   end
 
   @spec handle_decoded_udp_message(:dns.message(), :gen_udp.socket(), :gen_udp.ip(), :inet.port_number()) :: :ok | {:error, :not_owner | :inet.posix()}
   defp handle_decoded_udp_message(decoded_message, socket, host, port) do
-    response = Exdns.Handler.handle(decoded_message, {:udp, host})
-    {_, encoded_message} =  Exdns.Encoder.encode_message(response, [{:"max_size", max_payload_size(response)}])
+    response = ExDNS.Handler.handle(decoded_message, {:udp, host})
+    {_, encoded_message} =  ExDNS.Encoder.encode_message(response, [{:"max_size", max_payload_size(response)}])
     :gen_udp.send(socket, host, port, encoded_message)
   end
 
   defp max_payload_size(message) do
-    case Exdns.Records.dns_message(message, :additional) do
+    case ExDNS.Records.dns_message(message, :additional) do
       [opt|_] when Record.is_record(opt, :dns_optrr) ->
-        case Exdns.Records.dns_optrr(opt, :udp_payload_size) do
+        case ExDNS.Records.dns_optrr(opt, :udp_payload_size) do
           [] -> @max_packet_size
           udp_payload_size -> udp_payload_size
         end

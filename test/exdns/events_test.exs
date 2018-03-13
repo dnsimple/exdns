@@ -1,4 +1,4 @@
-defmodule Exdns.EventsTest do
+defmodule ExDNS.EventsTest do
   use ExUnit.Case
   require Logger
 
@@ -19,20 +19,20 @@ defmodule Exdns.EventsTest do
   end
 
   test "start the event manager" do
-    Exdns.Events.start_link()
+    ExDNS.Events.start_link()
   end
 
   test "add handler and notify" do
-    Exdns.Events.add_handler(Exdns.EventsTest.EventCapture, [])
-    Exdns.Events.notify(:test)
-    assert GenEvent.call(Exdns.Events, Exdns.EventsTest.EventCapture, :messages) == [:test]
+    ExDNS.Events.add_handler(ExDNS.EventsTest.EventCapture, [])
+    ExDNS.Events.notify(:test)
+    assert GenEvent.call(ExDNS.Events, ExDNS.EventsTest.EventCapture, :messages) == [:test]
   end
 
   test "handle start_severs event" do
-    Exdns.Server.Supervisor.stop()
-    Exdns.Events.add_handler(Exdns.Events, [])
-    assert GenEvent.call(Exdns.Events, Exdns.Events, :get_servers_running) == false
-    Exdns.Events.notify(:start_servers)
-    assert GenEvent.call(Exdns.Events, Exdns.Events, :get_servers_running) == true
+    ExDNS.Server.Supervisor.stop()
+    ExDNS.Events.add_handler(ExDNS.Events, [])
+    assert GenEvent.call(ExDNS.Events, ExDNS.Events, :get_servers_running) == false
+    ExDNS.Events.notify(:start_servers)
+    assert GenEvent.call(ExDNS.Events, ExDNS.Events, :get_servers_running) == true
   end
 end

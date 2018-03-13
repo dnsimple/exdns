@@ -1,4 +1,4 @@
-defmodule Exdns.Config do
+defmodule ExDNS.Config do
   @moduledoc """
   Configuration details for exdns.
   """
@@ -9,7 +9,7 @@ defmodule Exdns.Config do
 
   def zone_file, do: Application.get_env(:exdns, :zone_file, "zones.json")
 
-  def storage_type, do: Application.get_env(:exdns, :storage_type, Exdns.Storage.EtsStorage)
+  def storage_type, do: Application.get_env(:exdns, :storage_type, ExDNS.Storage.EtsStorage)
 
   def num_workers, do: Application.get_env(:exdns, :num_workers, 16)
 

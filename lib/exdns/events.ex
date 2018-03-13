@@ -1,96 +1,92 @@
-defmodule Exdns.Events do
+defmodule ExDNS.Events do
   @moduledoc """
   Event manager for events fired by exdns.
   """
 
-  use GenEvent
+  use GenServer
   require Logger
 
   # Public API
 
-  def start_link() do
-    GenEvent.start_link(name: Exdns.Events)
+  def start_link([]) do
+    GenEvent.start_link(name: ExDNS.Events)
   end
 
   def notify(message) do
-    GenEvent.notify(Exdns.Events, message)
-  end
-
-  def add_handler(module, args) do
-    GenEvent.add_handler(Exdns.Events, module, args)
+    GenEvent.notify(ExDNS.Events, message)
   end
 
   # GenEvent callbacks
   def init(_) do
-    {:ok, %{:servers_running => false}}
+    {:noreply, %{:servers_running => false}}
   end
 
   def handle_call(:get_servers_running, state) do
-    {:ok, Map.get(state, :servers_running), state}
+    {:noreply, Map.get(state, :servers_running), state}
   end
 
   # Event handlers
 
-  def handle_event(:start_servers, state) do
+  def handle_cast(:start_servers, state) do
     if Map.get(state, :servers_running) do
-      Exdns.Events.notify(:servers_already_started)
-      {:ok, state}
+      ExDNS.Events.notify(:servers_already_started)
+      {:noreply, state}
     else
-      Exdns.Server.Supervisor.start_link()
-      Exdns.Events.notify(:servers_started)
-      {:ok, %{state | servers_running: true}}
+      ExDNS.Server.Supervisor.start_link([])
+      ExDNS.Events.notify(:servers_started)
+      {:noreply, %{state | servers_running: true}}
     end
   end
 
-  def handle_event(:stop_servers, state) do
-    {:ok, %{state | servers_running: false}}
+  def handle_cast(:stop_servers, state) do
+    {:noreply, %{state | servers_running: false}}
   end
 
-  def handle_event({:end_udp, [{:host, _host}]}, state) do
+  def handle_cast({:end_udp, [{:host, _host}]}, state) do
     :folsom_metrics.notify({:udp_request_meter, 1})
     :folsom_metrics.notify({:udp_request_counter, {:inc, 1}})
-    {:ok, state}
+    {:noreply, state}
   end
 
-  def handle_event({:end_tcp, [{:host, _host}]}, state) do
+  def handle_cast({:end_tcp, [{:host, _host}]}, state) do
     :folsom_metrics.notify({:tcp_request_meter, 1})
     :folsom_metrics.notify({:tcp_request_counter, {:inc, 1}})
-    {:ok, state}
+    {:noreply, state}
   end
 
-  def handle_event({:udp_error, reason}, state) do
+  def handle_cast({:udp_error, reason}, state) do
     :folsom_metrics.notify({:udp_error_meter, 1})
     :folsom_metrics.notify({:udp_error_history, reason})
-    {:ok, state}
+    {:noreply, state}
   end
 
-  def handle_event({:tcp_error, reason}, state) do
+  def handle_cast({:tcp_error, reason}, state) do
     :folsom_metrics.notify({:tcp_error_meter, 1})
     :folsom_metrics.notify({:tcp_error_history, reason})
-    {:ok, state}
+    {:noreply, state}
   end
 
-  def handle_event({:refused_response, questions}, state) do
+  def handle_cast({:refused_response, questions}, state) do
     :folsom_metrics.notify({:refused_response_meter, 1})
     :folsom_metrics.notify({:refused_response_counter, {:inc, 1}})
     Logger.debug("Refused response: #{inspect questions}")
-    {:ok, state}
+    {:noreply, state}
   end
 
-  def handle_event({:empty_response, message}, state) do
+  def handle_cast({:empty_response, message}, state) do
     :folsom_metrics.notify({:empty_response_meter, 1})
     :folsom_metrics.notify({:empty_response_counter, {:inc, 1}})
     Logger.info("Empty response: #{inspect message}")
-    {:ok, state}
+    {:noreply, state}
   end
 
-  def handle_event({:dnssec_request, _host, _qname}, state) do
+  def handle_cast({:dnssec_request, _host, _qname}, state) do
     :folsom_metrics.notify(:dnssec_request_meter, 1)
     :folsom_metrics.notify(:dnssec_request_counter, {:inc, 1})
-    {:ok, state}
+    {:noreply, state}
   end
 
-  def handle_event(_event, state) do
-    {:ok, state}
+  def handle_cast(_cast, state) do
+    {:noreply, state}
   end
 end

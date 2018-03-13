@@ -1,13 +1,13 @@
-defmodule Exdns.Zone.Cache do
+defmodule ExDNS.Zone.Cache do
   @moduledoc """
   In-memory cache for all zones.
   """
 
   use GenServer
-  require Exdns.Records
+  require ExDNS.Records
 
-  def start_link() do
-    GenServer.start_link(__MODULE__, [], name: Exdns.Zone.Cache)
+  def start_link([]) do
+    GenServer.start_link(__MODULE__, [], name: ExDNS.Zone.Cache)
   end
 
   def find_zone(qname) do
@@ -34,7 +34,7 @@ defmodule Exdns.Zone.Cache do
         case get_zone(name) do
           {:ok, zone} -> zone
           {:error, :zone_not_found} ->
-            if name == Exdns.Records.dns_rr(authority, :name) do
+            if name == ExDNS.Records.dns_rr(authority, :name) do
               {:error, :zone_not_found}
             else
               find_zone(:dns.labels_to_dname(labels), authority)
@@ -45,7 +45,7 @@ defmodule Exdns.Zone.Cache do
 
   def get_zone(name) do
     name = normalize_name(name)
-    case Exdns.Storage.select(:zones, name) do
+    case ExDNS.Storage.select(:zones, name) do
       [{^name, zone}] -> {:ok, %{zone | records: [], records_by_name: :trimmed}}
       _ -> get_fallback()
     end
@@ -59,8 +59,8 @@ defmodule Exdns.Zone.Cache do
   end
 
   defp get_wildcard_zone do
-    if Exdns.Config.wildcard_fallback? do
-      case Exdns.Storage.select(:zones, "*") do
+    if ExDNS.Config.wildcard_fallback? do
+      case ExDNS.Storage.select(:zones, "*") do
         [{"*", zone}] -> {:ok, zone}
         _ -> {:error, :zone_not_found}
       end
@@ -76,9 +76,9 @@ defmodule Exdns.Zone.Cache do
     end
   end
   def get_authority(message) do
-    case Exdns.Records.dns_message(message, :questions) do
+    case ExDNS.Records.dns_message(message, :questions) do
       [] -> {:error, :no_question}
-      questions -> List.last(questions) |> Exdns.Records.dns_query(:name) |> get_authority()
+      questions -> List.last(questions) |> ExDNS.Records.dns_query(:name) |> get_authority()
     end
   end
 
@@ -86,7 +86,7 @@ defmodule Exdns.Zone.Cache do
   def get_delegations(name) do
     case find_zone_in_cache(name) do
       {:ok, zone} ->
-        Enum.filter(zone.records, fn(r) -> apply(Exdns.Records.match_type(:dns_terms_const.dns_type_ns), [r]) and apply(Exdns.Records.match_delegation(name), [r]) end)
+        Enum.filter(zone.records, fn(r) -> apply(ExDNS.Records.match_type(:dns_terms_const.dns_type_ns), [r]) and apply(ExDNS.Records.match_delegation(name), [r]) end)
       _ ->
         []
     end
@@ -110,16 +110,16 @@ defmodule Exdns.Zone.Cache do
 
 
   def put_zone(name, zone) do
-    Exdns.Storage.insert(:zones, {normalize_name(name), zone})
+    ExDNS.Storage.insert(:zones, {normalize_name(name), zone})
     :ok
   end
 
   # GenServer callbacks
 
   def init([]) do
-    Exdns.Storage.create(:schema)
-    Exdns.Storage.create(:zones)
-    Exdns.Storage.create(:authorities)
+    ExDNS.Storage.create(:schema)
+    ExDNS.Storage.create(:zones)
+    ExDNS.Storage.create(:authorities)
     {:ok, %{:parsers => []}}
   end
 
@@ -144,7 +144,7 @@ defmodule Exdns.Zone.Cache do
     get_wildcard_zone()
   end
   def find_zone_in_cache(name, [_|labels]) do
-    case Exdns.Storage.select(:zones, name) do
+    case ExDNS.Storage.select(:zones, name) do
       [{_name, zone}] -> {:ok, zone}
       _ ->
         case labels do

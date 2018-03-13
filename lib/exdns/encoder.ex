@@ -1,10 +1,10 @@
-defmodule Exdns.Encoder do
+defmodule ExDNS.Encoder do
   @moduledoc """
   Functions for encoding DNS messages to binary representations safely.
   """
 
   require Logger
-  require Exdns.Records
+  require ExDNS.Records
 
   def encode_message(message) do
     encode_message(message, [])
@@ -16,7 +16,7 @@ defmodule Exdns.Encoder do
     {false, :dns.message_bin(), :dns.tsig_mac()} |
     {true, :dns.message_bin(), :dns.tsig_mac(), :dns.message()}
   def encode_message(message, opts) do
-    if Exdns.Config.catch_exceptions? do
+    if ExDNS.Config.catch_exceptions? do
       try do
         :dns.encode_message(message, opts)
       catch
@@ -33,5 +33,5 @@ defmodule Exdns.Encoder do
 
   defp build_error_message({_, message}), do: build_error_message(message, :dns_terms_const.dns_rcode_servfail)
   defp build_error_message(message), do: build_error_message(message, :dns_terms_const.dns_rcode_servfail)
-  defp build_error_message(_message, rcode), do: Exdns.Records.dns_message(rc: rcode)
+  defp build_error_message(_message, rcode), do: ExDNS.Records.dns_message(rc: rcode)
 end

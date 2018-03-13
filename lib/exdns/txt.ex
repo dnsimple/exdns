@@ -1,4 +1,4 @@
-defmodule Exdns.Txt do
+defmodule ExDNS.Txt do
   @moduledoc """
   Functions for parsing TXT record content.
   """

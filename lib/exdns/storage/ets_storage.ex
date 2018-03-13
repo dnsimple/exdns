@@ -1,4 +1,4 @@
-defmodule Exdns.Storage.EtsStorage do
+defmodule ExDNS.Storage.EtsStorage do
   @moduledoc """
   Storage engine backed by ETS
   """
