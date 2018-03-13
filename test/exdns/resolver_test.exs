@@ -48,7 +48,7 @@ defmodule ExDNS.ResolverTest do
   end
 
   test "test resolve when not authoritative and returning root hints" do
-    Application.put_env(:exdns, :use_root_hints, true)
+    Application.put_env(:ex_dns, :use_root_hints, true)
     question = ExDNS.Records.dns_query(name: "notfound.com", type: :dns_terms_const.dns_type_a)
     message = ExDNS.Records.dns_message(questions: [question])
     answer = ExDNS.Resolver.resolve(message, [], :host)
@@ -57,7 +57,7 @@ defmodule ExDNS.ResolverTest do
     assert length(ExDNS.Records.dns_message(answer, :answers)) == 0
     assert length(ExDNS.Records.dns_message(answer, :authority)) > 0
     assert length(ExDNS.Records.dns_message(answer, :additional)) > 0
-    Application.put_env(:exdns, :use_root_hints, false)
+    Application.put_env(:ex_dns, :use_root_hints, false)
   end
 
   test "test any wildcard" do

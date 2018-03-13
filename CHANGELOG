@@ -1,0 +1,5 @@
+2018-03-13  Théophile Choutri <theophile@choutri.eu>
+
+	* Capitalisation harmonisation. Tcp/Udp/Exdns become TCP/UDP/ExDNS.
+	* Use Jason instead of JSX for JSON decoding.
+	* Move to Elixir 1.6 / Erlang 20.2

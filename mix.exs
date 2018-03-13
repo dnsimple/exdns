@@ -17,7 +17,8 @@ defmodule ExDNS.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {ExDNS.Application, []}
+      mod: {ExDNS.Application, []},
+      start_phases: [{:post_start, []}]
     ]
   end
 
@@ -40,7 +41,7 @@ defmodule ExDNS.MixProject do
 
   defp package do
     [
-      name: :exdns,
+      name: :ex_dns,
       maintainers: ["Anthony Eden"],
       licenses: ["MIT License"],
       links: %{
@@ -49,5 +50,4 @@ defmodule ExDNS.MixProject do
       }
     ]
   end
-
 end

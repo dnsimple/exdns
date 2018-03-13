@@ -3,16 +3,16 @@ defmodule ExDNS.ConfigTest do
 
   test "catch exceptions" do
     assert !ExDNS.Config.catch_exceptions?
-    Application.put_env(:exdns, :catch_exceptions, true)
+    Application.put_env(:ex_dns, :catch_exceptions, true)
     assert ExDNS.Config.catch_exceptions?
-    Application.put_env(:exdns, :catch_exceptions, false)
+    Application.put_env(:ex_dns, :catch_exceptions, false)
   end
 
   test "use root hints" do
     assert !ExDNS.Config.use_root_hints?
-    Application.put_env(:exdns, :use_root_hints, true)
+    Application.put_env(:ex_dns, :use_root_hints, true)
     assert ExDNS.Config.use_root_hints?
-    Application.put_env(:exdns, :use_root_hints, false)
+    Application.put_env(:ex_dns, :use_root_hints, false)
   end
 
   test "provides zone file path" do

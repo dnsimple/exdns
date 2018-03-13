@@ -3,16 +3,8 @@ defmodule ExDNS do
   Documentation for ExDNS.
   """
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> ExDNS.hello
-      :world
-
-  """
-  def hello do
-    :world
+  def timestamp() do
+    {tm, ts, _} = :os.timestamp()
+    (tm * 1000000) + ts
   end
 end
