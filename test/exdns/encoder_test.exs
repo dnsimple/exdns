@@ -1,10 +1,10 @@
-defmodule Exdns.EncoderTest do
+defmodule ExDNS.EncoderTest do
   use ExUnit.Case, async: true
-  require Exdns.Records
+  require ExDNS.Records
 
   test "encode message" do
-    message = Exdns.Records.dns_message()
-    {false, bin} = Exdns.Encoder.encode_message(message)
-    assert Exdns.Decoder.decode_message(bin) == message 
+    message = ExDNS.Records.dns_message()
+    {false, bin} = ExDNS.Encoder.encode_message(message)
+    assert ExDNS.Decoder.decode_message(bin) == message 
   end
 end
