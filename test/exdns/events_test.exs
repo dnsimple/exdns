@@ -19,7 +19,7 @@ defmodule ExDNS.EventsTest do
   end
 
   test "start the event manager" do
-    ExDNS.Events.start_link()
+    ExDNS.Events.start_link([])
   end
 
   test "add handler and notify" do
@@ -29,7 +29,6 @@ defmodule ExDNS.EventsTest do
   end
 
   test "handle start_severs event" do
-    ExDNS.Server.Supervisor.stop()
     ExDNS.Events.add_handler(ExDNS.Events, [])
     assert GenEvent.call(ExDNS.Events, ExDNS.Events, :get_servers_running) == false
     ExDNS.Events.notify(:start_servers)
