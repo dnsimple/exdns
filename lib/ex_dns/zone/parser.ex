@@ -42,7 +42,7 @@ defmodule ExDNS.Zone.Parser do
   end
 
   def apply_context_options(_record = %{"context" => context}) do
-    case Application.get_env(:ex_dns, :context_options) do
+    case Application.get_env(:exdns, :context_options) do
       {:ok, _context_options} ->
         context_set = MapSet.new(context)
         result = [] # TODO implement

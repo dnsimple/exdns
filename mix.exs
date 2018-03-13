@@ -3,7 +3,7 @@ defmodule ExDNS.MixProject do
 
   def project do
     [
-      app: :ex_dns,
+      app: :exdns,
       version: "0.1.0",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
@@ -41,7 +41,7 @@ defmodule ExDNS.MixProject do
 
   defp package do
     [
-      name: :ex_dns,
+      name: :exdns,
       maintainers: ["Anthony Eden"],
       licenses: ["MIT License"],
       links: %{

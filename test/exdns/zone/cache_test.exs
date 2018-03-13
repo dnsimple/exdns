@@ -76,8 +76,8 @@ defmodule ExDNS.Zone.CacheTest do
   end
 
   test "fallback to wildcard zone when configured" do
-    Application.put_env(:ex_dns, :wildcard_fallback, true)
+    Application.put_env(:exdns, :wildcard_fallback, true)
     {:ok, _zone} = ExDNS.Zone.Cache.find_zone_in_cache("notfound.com")
-    Application.put_env(:ex_dns, :wildcard_fallback, false)
+    Application.put_env(:exdns, :wildcard_fallback, false)
   end
 end

@@ -4,13 +4,14 @@ defmodule ExDNS.PacketCache do
   """
 
   use GenServer
+  require Logger
 
   @enabled true
   @default_ttl 20
   @sweep_interval 1000 * 60 * 3 # Every 3 minutes
 
-  def start_link() do
-    GenServer.start_link(__MODULE__, [], name: ExDNS.PacketCache)
+  def start_link([]) do
+    GenServer.start_link(__MODULE__, [], name: __MODULE__) 
   end
 
   def get(question) do
@@ -56,6 +57,7 @@ defmodule ExDNS.PacketCache do
   # Server callbacks
 
   def init([]) do
+    Logger.info(IO.ANSI.green <> "Starting the Packet Cache" <> IO.ANSI.reset())
     init([@default_ttl])
   end
 

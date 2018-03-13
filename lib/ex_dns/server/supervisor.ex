@@ -7,7 +7,7 @@ defmodule ExDNS.Server.Supervisor do
   require Logger
 
   def start_link do
-    Supervisor.start_link(__MODULE__, [], name: ExDNS.Server.Supervisor)
+    Supervisor.start_link(__MODULE__, [], name: __MODULE__)
   end
 
   def stop do
@@ -23,6 +23,7 @@ defmodule ExDNS.Server.Supervisor do
   end
 
   def init(_) do
+    Logger.info(IO.ANSI.green <> "Starting the Server Supervisor" <> IO.ANSI.reset())
     servers = ExDNS.Config.servers
     if servers == [] and Mix.env != :test, do: Logger.warn("No servers are specified in your config")
     Enum.map(servers, &define_server/1) |> supervise(strategy: :one_for_one)

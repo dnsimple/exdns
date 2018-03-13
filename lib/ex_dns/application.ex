@@ -11,12 +11,12 @@ defmodule ExDNS.Application do
     # List all child processes to be supervised
     children = [
       ExDNS.Events,
+      ExDNS.Handler.Registry,
+      ExDNS.PacketCache,
+      ExDNS.QueryThrottle,
       ExDNS.Zone.Cache,
       ExDNS.Zone.Registry,
       # ExDNS.ZoneEncoder,
-      ExDNS.PacketCache,
-      ExDNS.QueryThrottle,
-      ExDNS.Handler.Registry
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -26,7 +26,6 @@ defmodule ExDNS.Application do
   end
 
   def start_phase(:post_start, _start_type, _phase_args) do
-    ExDNS.Events.add_handler(ExDNS.Events, [])
     ExDNS.Zone.Loader.load_zones()
     ExDNS.Events.notify(:start_servers)
     :ok

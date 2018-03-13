@@ -3,18 +3,18 @@ defmodule ExDNS.Config do
   Configuration details for exdns.
   """
 
-  def catch_exceptions?, do: Application.get_env(:ex_dns, :catch_exceptions, true)
+  def catch_exceptions?, do: Application.get_env(:exdns, :catch_exceptions, true)
 
-  def use_root_hints?, do: Application.get_env(:ex_dns, :use_root_hints, false)
+  def use_root_hints?, do: Application.get_env(:exdns, :use_root_hints, false)
 
-  def zone_file, do: Application.get_env(:ex_dns, :zone_file, "zones.json")
+  def zone_file, do: Application.get_env(:exdns, :zone_file, "zones.json")
 
-  def storage_type, do: Application.get_env(:ex_dns, :storage_type, ExDNS.Storage.EtsStorage)
+  def storage_type, do: Application.get_env(:exdns, :storage_type, ExDNS.Storage.EtsStorage)
 
-  def num_workers, do: Application.get_env(:ex_dns, :num_workers, 16)
+  def num_workers, do: Application.get_env(:exdns, :num_workers, 16)
 
-  def servers, do: Application.get_env(:ex_dns, :servers, [])
+  def servers, do: Application.get_env(:exdns, :servers, [])
 
-  def wildcard_fallback?, do: Application.get_env(:ex_dns, :wildcard_fallback, false)
+  def wildcard_fallback?, do: Application.get_env(:exdns, :wildcard_fallback, false)
 
 end

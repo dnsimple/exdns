@@ -4,10 +4,11 @@ defmodule ExDNS.Zone.Cache do
   """
 
   use GenServer
+  require Logger
   require ExDNS.Records
 
-  def start_link() do
-    GenServer.start_link(__MODULE__, [], name: ExDNS.Zone.Cache)
+  def start_link([]) do
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
   def find_zone(qname) do
@@ -117,6 +118,7 @@ defmodule ExDNS.Zone.Cache do
   # GenServer callbacks
 
   def init([]) do
+    Logger.info(IO.ANSI.green <> "Starting the Cache" <> IO.ANSI.reset())
     ExDNS.Storage.create(:schema)
     ExDNS.Storage.create(:zones)
     ExDNS.Storage.create(:authorities)

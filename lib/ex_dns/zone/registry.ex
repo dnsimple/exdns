@@ -4,8 +4,9 @@ defmodule ExDNS.Zone.Registry do
   """
 
   use GenServer
+  require Logger
 
-  def start_link do
+  def start_link([]) do
     GenServer.start_link(__MODULE__, [], name: ExDNS.Zone.Registry)
   end
 
@@ -24,6 +25,7 @@ defmodule ExDNS.Zone.Registry do
   ## Server callbacks
 
   def init([]) do
+    Logger.info(IO.ANSI.green <> "Starting the Zone Registry" <> IO.ANSI.reset())
     {:ok, []}
   end
 

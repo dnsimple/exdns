@@ -16,13 +16,13 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
   1. Add exdns to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:ex_dns, "~> 0.0.1"}]
+          [{:exdns, "~> 0.0.1"}]
         end
 
   2. Ensure exdns is started before your application:
 
         def application do
-          [applications: [:ex_dns]]
+          [applications: [:exdns]]
         end
 
 ## Running locally
@@ -35,7 +35,7 @@ Note that to run in production you will need to set up a production configuratio
 and add one or more servers to it.
 
 ```Elixir
-config :ex_dns, servers: [
+config :exdns, servers: [
   %{name: :udp_inet_localhost_1, type: ExDNS.Server.UDPServer, address: "127.0.0.1", port: 8053, family: :inet},
   %{name: :udp_inet6_localhost_1, type: ExDNS.Server.UDPServer, address: "::1", port: 8053, family: :inet6},
   %{name: :tcp_inet_localhost_1, type: ExDNS.Server.TCPServer, address: "127.0.0.1", port: 8053, family: :inet},

@@ -6,6 +6,7 @@ defmodule ExDNS.QueryThrottle do
   """
 
   use GenServer
+  require Logger
   require ExDNS.Records
 
   @limit 1
@@ -13,7 +14,7 @@ defmodule ExDNS.QueryThrottle do
   @enabled true
   @sweep_interval 1000 * 60 * 5
 
-  def start_link() do
+  def start_link([]) do
     GenServer.start_link(__MODULE__, [], name: ExDNS.QueryThrottle)
   end
 
@@ -49,6 +50,7 @@ defmodule ExDNS.QueryThrottle do
   # GenServer callbacks
 
   def init([]) do
+    Logger.info(IO.ANSI.green <> "Starting the Query Throttler" <> IO.ANSI.reset())
     ExDNS.Storage.create(:host_throttle)
     {:ok, tref} = :timer.apply_interval(@sweep_interval, ExDNS.QueryThrottle, :sweep, [])
     {:ok, %{tref: tref}}

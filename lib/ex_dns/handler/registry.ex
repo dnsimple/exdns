@@ -4,26 +4,28 @@ defmodule ExDNS.Handler.Registry do
   """
 
   use GenServer
+  require Logger
 
-  def start_link do
-    GenServer.start_link(__MODULE__, [], name: ExDNS.Handler.Registry)
+  def start_link([]) do
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
   def register_handler(record_types, module) do
-    GenServer.call(ExDNS.Handler.Registry, {:register_handler, record_types, module})
+    GenServer.call(__MODULE__, {:register_handler, record_types, module})
   end
 
   def get_handlers do
-    GenServer.call(ExDNS.Handler.Registry, {:get_handlers})
+    GenServer.call(__MODULE__, {:get_handlers})
   end
 
   def clear do
-    GenServer.call(ExDNS.Handler.Registry, :clear)
+    GenServer.call(__MODULE__, :clear)
   end
 
   ## Server callbacks
 
   def init([]) do
+    Logger.info(IO.ANSI.green <> "Starting the Registry" <> IO.ANSI.reset())
     {:ok, []}
   end
 
