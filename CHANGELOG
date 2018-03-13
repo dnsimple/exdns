@@ -3,5 +3,5 @@
 	* Capitalisation harmonisation. Tcp/Udp/Exdns become TCP/UDP/ExDNS.
 	* Use Jason instead of JSX for JSON decoding.
 	* Move to Elixir 1.6 / Erlang 20.2
-	* Move from deprecated GenEvent to Registry.
+	* Move from deprecated GenEvent to a GenServer
 	* Startup logging

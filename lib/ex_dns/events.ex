@@ -15,22 +15,11 @@ defmodule ExDNS.Events do
 
   def init(_) do
     Logger.info(IO.ANSI.green <> "Starting the Events Handler" <> IO.ANSI.reset())
-    Registry.start_link(keys: :duplicate, name: EventsHandler)
     {:ok, %{servers_running: false}}
   end
 
   def notify(topic) do
     GenServer.cast(Events, topic)
-  end
-
-  def broadcast(topic, message) do
-    Registry.dispatch(__MODULE__, topic, fn entries ->
-      for {pid, _} <- entries, do: GenServer.cast(pid, {topic, message})
-    end)
-  end
-
-  def subscribe(topic) do
-    Registry.register(EventsHandler, topic, [])
   end
 
   def handle_cast(:start_servers, state) do
