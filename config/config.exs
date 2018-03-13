@@ -8,20 +8,18 @@ use Mix.Config
 # if you want to provide default values for your application for
 # 3rd-party users, it should be done in your "mix.exs" file.
 
-# You can configure for your application as:
+# You can configure your application as:
 #
-#     config :exdns, key: :value
+#     config :ex_dns, key: :value
 #
-# And access this configuration in your application as:
+# and access this configuration in your application as:
 #
-#     Application.get_env(:exdns, :key)
+#     Application.get_env(:ex_dns, :key)
 #
-# Or configure a 3rd-party app:
+# You can also configure a 3rd-party app:
 #
 #     config :logger, level: :info
 #
-
-config :exdns, catch_exceptions: true
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment
@@ -30,5 +28,3 @@ config :exdns, catch_exceptions: true
 # here (which is why it is important to import them last).
 #
 #     import_config "#{Mix.env}.exs"
-
-import_config "#{Mix.env}.exs"

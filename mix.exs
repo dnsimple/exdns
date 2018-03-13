@@ -1,46 +1,40 @@
-defmodule Exdns.Mixfile do
+defmodule ExDNS.MixProject do
   use Mix.Project
 
   def project do
-    [app: :exdns,
-     version: "0.0.2",
-     elixir: "~> 1.2",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     description: description(),
-     package: package(),
-     deps: deps()]
+    [
+      app: :ex_dns,
+      version: "0.1.0",
+      elixir: "~> 1.6",
+      start_permanent: Mix.env() == :prod,
+      description: description(),
+      package: package(),
+      deps: deps()
+    ]
   end
 
-  # Configuration for the OTP application
-  #
-  # Type "mix help compile.app" for more information
+  # Run "mix help compile.app" to learn about applications.
   def application do
-    [applications: [:logger, :folsom], mod: {Exdns, []}, start_phases: [{:post_start, []}]]
+    [
+      extra_applications: [:logger],
+      mod: {ExDNS.Application, []}
+    ]
   end
 
-  # Dependencies can be Hex packages:
-  #
-  #   {:mydep, "~> 0.3.0"}
-  #
-  # Or git/path repositories:
-  #
-  #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-  #
-  # Type "mix help deps" for more examples and options
+  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:folsom, "~> 0.8.3"},
-      {:exjsx, "~> 3.2.0"},
+      {:earmark, "~> 1.2"},
+      {:ex_doc, "~> 0.18"},
       {:dns_erlang, git: "https://github.com/aetrion/dns_erlang.git", app: false},
-      {:ex_doc, ">= 0.0.0", only: :dev},
-      {:earmark, ">= 0.0.0", only: :dev}
+      {:folsom, "~> 0.8"},
+      {:jason, "~> 1.0"}
     ]
   end
 
   defp description do
     """
-    exdns is an authoritative name server. It is ported from erldns and adapted to the Elixir language.
+    ExDNS is an authoritative name server. It is ported from erldns and adapted to the Elixir language.
     """
   end
 
@@ -55,4 +49,5 @@ defmodule Exdns.Mixfile do
       }
     ]
   end
+
 end
