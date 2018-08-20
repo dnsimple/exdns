@@ -5,7 +5,7 @@ defmodule Exdns.Txt do
 
   @max_txt_size 255
 
-  def parse(v) when is_binary(v), do: List.flatten(parse(to_char_list(v)))
+  def parse(v) when is_binary(v), do: List.flatten(parse(to_charlist(v)))
 
   def parse([]), do: []
   def parse([c|rest]), do: parse_char([c|rest], c, rest, [], false)
@@ -35,7 +35,7 @@ defmodule Exdns.Txt do
       {first, rest} = String.split_at(List.to_string(data), @max_txt_size)
       case rest do
         "" -> parts ++ [[first]]
-        _ -> split(to_char_list(rest), parts ++ [first])
+        _ -> split(to_charlist(rest), parts ++ [first])
       end
     else
       parts ++ [List.to_string(data)]

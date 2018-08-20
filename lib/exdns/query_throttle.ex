@@ -58,7 +58,7 @@ defmodule Exdns.QueryThrottle do
     {:reply, :ok, state}
   end
   def handle_call(:sweep, _from, state) do
-    Exdns.Storage.select(:host_throttle, [{{:"$1", {:"_", :"$2"}}, [{:<, :"$2", Exdns.timestamp() - @expiration}], [:"$1"]}], :infinite) |>
+    Exdns.Storage.select(:host_throttle, [{{:"$1", {:_, :"$2"}}, [{:<, :"$2", Exdns.timestamp() - @expiration}], [:"$1"]}], :infinite) |>
       Enum.each(fn(k) -> Exdns.Storage.delete(:host_throttle, k) end)
     {:reply, :ok, state}
   end

@@ -29,7 +29,7 @@ defmodule Exdns.Server.Supervisor do
   end
 
   def define_server(%{name: name, type: type, address: raw_ip, port: port, family: family}) do
-    case :inet_parse.address(to_char_list(raw_ip)) do
+    case :inet_parse.address(to_charlist(raw_ip)) do
       {:ok, address} -> worker(type, [name, family, address, port], id: name, restart: :permanent, timeout: 5000)
       {:error, reason} -> raise ArgumentError, reason
     end

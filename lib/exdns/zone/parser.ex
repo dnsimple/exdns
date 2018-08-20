@@ -41,10 +41,10 @@ defmodule Exdns.Zone.Parser do
     }
   end
 
-  def apply_context_options(_record = %{"context" => context}) do
+  def apply_context_options(_record = %{"context" => _context}) do
     case Application.get_env(:exdns, :context_options) do
       {:ok, _context_options} ->
-        context_set = MapSet.new(context)
+        # context_set = MapSet.new(context)
         result = [] # TODO implement
         if Enum.any?(result, fn(i) -> i == :pass end) do
           :pass
@@ -70,7 +70,7 @@ defmodule Exdns.Zone.Parser do
   """
   def json_record_to_rr(%{"name" => name, "type" => "A", "ttl" => ttl, "data" => data}) do
     raw_ip = data["ip"]
-    case :inet_parse.address(to_char_list(raw_ip)) do
+    case :inet_parse.address(to_charlist(raw_ip)) do
       {:ok, address} ->
         Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_a, data: Exdns.Records.dns_rrdata_a(ip: address), ttl: ttl)
       {:error, reason} ->
@@ -81,7 +81,7 @@ defmodule Exdns.Zone.Parser do
 
   def json_record_to_rr(%{"name" => name, "type" => "AAAA", "ttl" => ttl, "data" => data}) do
     raw_ip = data["ip"]
-    case :inet_parse.address(to_char_list(raw_ip)) do
+    case :inet_parse.address(to_charlist(raw_ip)) do
       {:ok, address} ->
         Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_aaaa, data: Exdns.Records.dns_rrdata_aaaa(ip: address), ttl: ttl)
       {:error, reason} ->

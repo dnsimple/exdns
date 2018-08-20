@@ -76,7 +76,7 @@ defmodule Exdns.PacketCache do
   end
 
   def handle_call(:sweep, _from, state) do
-    Exdns.Storage.select(:packet_cache, [{{:"$1", {:"_", :"$2"}}, [{:<, :"$2", Exdns.timestamp() - 10}], [:"$1"]}], :infinite) |>
+    Exdns.Storage.select(:packet_cache, [{{:"$1", {:_, :"$2"}}, [{:<, :"$2", Exdns.timestamp() - 10}], [:"$1"]}], :infinite) |>
       Enum.each(fn(k) -> Exdns.Storage.delete(:packet_cache, k) end)
     {:reply, :ok, state}
   end

@@ -114,7 +114,7 @@ defmodule Exdns.Worker do
   @spec handle_decoded_udp_message(:dns.message(), :gen_udp.socket(), :gen_udp.ip(), :inet.port_number()) :: :ok | {:error, :not_owner | :inet.posix()}
   defp handle_decoded_udp_message(decoded_message, socket, host, port) do
     response = Exdns.Handler.handle(decoded_message, {:udp, host})
-    {_, encoded_message} =  Exdns.Encoder.encode_message(response, [{:"max_size", max_payload_size(response)}])
+    {_, encoded_message} =  Exdns.Encoder.encode_message(response, [{:max_size, max_payload_size(response)}])
     :gen_udp.send(socket, host, port, encoded_message)
   end
 
