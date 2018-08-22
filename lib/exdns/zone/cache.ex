@@ -18,22 +18,31 @@ defmodule Exdns.Zone.Cache do
   def find_zone(qname, {:error, _}) do
     find_zone(qname, [])
   end
+
   def find_zone(qname, {:ok, authority}) do
     find_zone(qname, authority)
   end
+
   def find_zone(_qname, []) do
     {:error, :not_authoritative}
   end
+
   def find_zone(qname, authorities) when is_list(authorities) do
     find_zone(qname, List.last(authorities))
   end
+
   def find_zone(name, authority) do
     name = normalize_name(name)
+
     case :dns.dname_to_labels(name) do
-      [] -> {:error, :zone_not_found}
-      [_|labels] ->
+      [] ->
+        {:error, :zone_not_found}
+
+      [_ | labels] ->
         case get_zone(name) do
-          {:ok, zone} -> zone
+          {:ok, zone} ->
+            zone
+
           {:error, :zone_not_found} ->
             if name == Exdns.Records.dns_rr(authority, :name) do
               {:error, :zone_not_found}
@@ -46,6 +55,7 @@ defmodule Exdns.Zone.Cache do
 
   def get_zone(name) do
     name = normalize_name(name)
+
     case Exdns.Storage.select(:zones, name) do
       [{^name, zone}] -> {:ok, %{zone | records: [], records_by_name: :trimmed}}
       _ -> get_fallback()
@@ -60,7 +70,7 @@ defmodule Exdns.Zone.Cache do
   end
 
   defp get_wildcard_zone do
-    if Exdns.Config.wildcard_fallback? do
+    if Exdns.Config.wildcard_fallback?() do
       case Exdns.Storage.select(:zones, "*") do
         [{"*", zone}] -> {:ok, zone}
         _ -> {:error, :zone_not_found}
@@ -76,6 +86,7 @@ defmodule Exdns.Zone.Cache do
       _ -> {:error, :authority_not_found}
     end
   end
+
   def get_authority(message) do
     case Exdns.Records.dns_message(message, :questions) do
       [] -> {:error, :no_question}
@@ -83,16 +94,18 @@ defmodule Exdns.Zone.Cache do
     end
   end
 
-
   def get_delegations(name) do
     case find_zone_in_cache(name) do
       {:ok, zone} ->
-        Enum.filter(zone.records, fn(r) -> apply(Exdns.Records.match_type(@_DNS_TYPE_NS), [r]) and apply(Exdns.Records.match_delegation(name), [r]) end)
+        Enum.filter(zone.records, fn r ->
+          apply(Exdns.Records.match_type(@_DNS_TYPE_NS), [r]) and
+            apply(Exdns.Records.match_delegation(name), [r])
+        end)
+
       _ ->
         []
     end
   end
-
 
   def get_records_by_name(name) do
     case find_zone_in_cache(name) do
@@ -101,14 +114,12 @@ defmodule Exdns.Zone.Cache do
     end
   end
 
-
   def in_zone?(name) do
     case find_zone_in_cache(name) do
       {:ok, zone} -> is_name_in_zone(name, zone)
       _ -> false
     end
   end
-
 
   def put_zone(name, zone) do
     Exdns.Storage.insert(:zones, {normalize_name(name), zone})
@@ -133,7 +144,7 @@ defmodule Exdns.Zone.Cache do
       case :dns.dname_to_labels(name) do
         [] -> false
         [_] -> false
-        [_|labels] -> is_name_in_zone(:dns.labels_to_dname(labels), zone)
+        [_ | labels] -> is_name_in_zone(:dns.labels_to_dname(labels), zone)
       end
     end
   end
@@ -141,12 +152,16 @@ defmodule Exdns.Zone.Cache do
   def find_zone_in_cache(name) do
     find_zone_in_cache(normalize_name(name), :dns.dname_to_labels(name))
   end
+
   def find_zone_in_cache(_name, []) do
     get_wildcard_zone()
   end
-  def find_zone_in_cache(name, [_|labels]) do
+
+  def find_zone_in_cache(name, [_ | labels]) do
     case Exdns.Storage.select(:zones, name) do
-      [{_name, zone}] -> {:ok, zone}
+      [{_name, zone}] ->
+        {:ok, zone}
+
       _ ->
         case labels do
           [] -> get_wildcard_zone()

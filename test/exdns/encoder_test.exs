@@ -5,6 +5,6 @@ defmodule Exdns.EncoderTest do
   test "encode message" do
     message = Exdns.Records.dns_message()
     {false, bin} = Exdns.Encoder.encode_message(message)
-    assert Exdns.Decoder.decode_message(bin) == message 
+    assert Exdns.Decoder.decode_message(bin) == message
   end
 end

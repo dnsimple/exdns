@@ -1,9 +1,12 @@
 defmodule Exdns.Zone.Parser do
+  @moduledoc """
+  Functions for parsing zones from JSON
+  """
   require Logger
   require Exdns.Records
 
   use Exdns.Constants
- 
+
   @doc """
   Convert a Map structure from exjxs to an Exdns.Zone instance.
 
@@ -14,26 +17,30 @@ defmodule Exdns.Zone.Parser do
   def json_to_zone(%{"name" => name, "sha" => sha, "records" => records}) do
     json_to_zone(name, sha, records)
   end
+
   def json_to_zone(%{"name" => name, "records" => records}) do
     json_to_zone(name, "", records)
   end
 
   defp json_to_zone(name, sha, records) do
-    records = Enum.map(records, fn(r) ->
-      # filter by context
-      case apply_context_options(r) do
-        :pass ->
-          case json_record_to_rr(r) do
-            {} -> try_custom_parsers(r, Exdns.Zone.Registry.get_all)
-            record -> record
-          end
-        _ ->
-          {}
-      end
-    end)
+    records =
+      Enum.map(records, fn r ->
+        # filter by context
+        case apply_context_options(r) do
+          :pass ->
+            case json_record_to_rr(r) do
+              {} -> try_custom_parsers(r, Exdns.Zone.Registry.get_all())
+              record -> record
+            end
+
+          _ ->
+            {}
+        end
+      end)
 
     records_by_name = build_named_index(records)
     authorities = Enum.filter(records, Exdns.Records.match_type(@_DNS_TYPE_SOA))
+
     %Exdns.Zone{
       name: name,
       version: sha,
@@ -47,20 +54,25 @@ defmodule Exdns.Zone.Parser do
     case Application.get_env(:exdns, :context_options) do
       {:ok, _context_options} ->
         # context_set = MapSet.new(context)
-        result = [] # TODO implement
-        if Enum.any?(result, fn(i) -> i == :pass end) do
+        # TODO implement
+        result = []
+
+        if Enum.any?(result, fn i -> i == :pass end) do
           :pass
         else
           :fail
         end
+
       _ ->
         :pass
     end
   end
+
   def apply_context_options(_), do: :pass
 
   def try_custom_parsers(_record, []), do: {}
-  def try_custom_parsers(record, [parser|rest]) do
+
+  def try_custom_parsers(record, [parser | rest]) do
     case parser.json_record_to_rr(record) do
       {} -> try_custom_parsers(record, rest)
       r -> r
@@ -72,9 +84,16 @@ defmodule Exdns.Zone.Parser do
   """
   def json_record_to_rr(%{"name" => name, "type" => "A", "ttl" => ttl, "data" => data}) do
     raw_ip = data["ip"]
+
     case :inet_parse.address(to_charlist(raw_ip)) do
       {:ok, address} ->
-        Exdns.Records.dns_rr(name: name, type: @_DNS_TYPE_A, data: Exdns.Records.dns_rrdata_a(ip: address), ttl: ttl)
+        Exdns.Records.dns_rr(
+          name: name,
+          type: @_DNS_TYPE_A,
+          data: Exdns.Records.dns_rrdata_a(ip: address),
+          ttl: ttl
+        )
+
       {:error, reason} ->
         Logger.error("Failed to parse A record address #{raw_ip}: #{reason}")
         {}
@@ -83,9 +102,16 @@ defmodule Exdns.Zone.Parser do
 
   def json_record_to_rr(%{"name" => name, "type" => "AAAA", "ttl" => ttl, "data" => data}) do
     raw_ip = data["ip"]
+
     case :inet_parse.address(to_charlist(raw_ip)) do
       {:ok, address} ->
-        Exdns.Records.dns_rr(name: name, type: @_DNS_TYPE_AAAA, data: Exdns.Records.dns_rrdata_aaaa(ip: address), ttl: ttl)
+        Exdns.Records.dns_rr(
+          name: name,
+          type: @_DNS_TYPE_AAAA,
+          data: Exdns.Records.dns_rrdata_aaaa(ip: address),
+          ttl: ttl
+        )
+
       {:error, reason} ->
         Logger.error("Failed to parse AAAA record address #{raw_ip}: #{reason}")
         {}
@@ -103,12 +129,23 @@ defmodule Exdns.Zone.Parser do
   end
 
   def json_record_to_rr(%{"name" => name, "type" => "MX", "ttl" => ttl, "data" => data}) do
-    rrdata = Exdns.Records.dns_rrdata_mx(exchange: data["exchange"], preference: data["preference"])
+    rrdata =
+      Exdns.Records.dns_rrdata_mx(exchange: data["exchange"], preference: data["preference"])
+
     Exdns.Records.dns_rr(name: name, type: @_DNS_TYPE_MX, data: rrdata, ttl: ttl)
   end
 
   def json_record_to_rr(%{"name" => name, "type" => "NAPTR", "ttl" => ttl, "data" => data}) do
-    rrdata = Exdns.Records.dns_rrdata_naptr(order: data["order"], preference: data["preference"], flags: data["flags"], services: data["services"], regexp: data["regexp"], replacement: data["replacement"])
+    rrdata =
+      Exdns.Records.dns_rrdata_naptr(
+        order: data["order"],
+        preference: data["preference"],
+        flags: data["flags"],
+        services: data["services"],
+        regexp: data["regexp"],
+        replacement: data["replacement"]
+      )
+
     Exdns.Records.dns_rr(name: name, type: @_DNS_TYPE_NAPTR, data: rrdata, ttl: ttl)
   end
 
@@ -123,9 +160,17 @@ defmodule Exdns.Zone.Parser do
   end
 
   def json_record_to_rr(%{"name" => name, "type" => "SOA", "ttl" => ttl, "data" => data}) do
-    rrdata = Exdns.Records.dns_rrdata_soa(mname: data["mname"], rname: data["rname"],
-      serial: data["serial"], refresh: data["refresh"], retry: data["retry"],
-      expire: data["expire"], minimum: data["minimum"])
+    rrdata =
+      Exdns.Records.dns_rrdata_soa(
+        mname: data["mname"],
+        rname: data["rname"],
+        serial: data["serial"],
+        refresh: data["refresh"],
+        retry: data["retry"],
+        expire: data["expire"],
+        minimum: data["minimum"]
+      )
+
     Exdns.Records.dns_rr(name: name, type: @_DNS_TYPE_SOA, data: rrdata, ttl: ttl)
   end
 
@@ -135,13 +180,25 @@ defmodule Exdns.Zone.Parser do
   end
 
   def json_record_to_rr(%{"name" => name, "type" => "SRV", "ttl" => ttl, "data" => data}) do
-    rrdata = Exdns.Records.dns_rrdata_srv(priority: data["priority"], weight: data["weight"], port: data["port"], target: data["target"])
+    rrdata =
+      Exdns.Records.dns_rrdata_srv(
+        priority: data["priority"],
+        weight: data["weight"],
+        port: data["port"],
+        target: data["target"]
+      )
+
     Exdns.Records.dns_rr(name: name, type: @_DNS_TYPE_SRV, data: rrdata, ttl: ttl)
   end
 
-
   def json_record_to_rr(%{"name" => name, "type" => "SSHFP", "ttl" => ttl, "data" => data}) do
-    rrdata = Exdns.Records.dns_rrdata_sshfp(alg: data["alg"], fp_type: data["fp_type"], fp: Base.decode16!(data["fp"], case: :mixed))
+    rrdata =
+      Exdns.Records.dns_rrdata_sshfp(
+        alg: data["alg"],
+        fp_type: data["fp_type"],
+        fp: Base.decode16!(data["fp"], case: :mixed)
+      )
+
     Exdns.Records.dns_rr(name: name, type: @_DNS_TYPE_SSHFP, data: rrdata, ttl: ttl)
   end
 
@@ -151,10 +208,9 @@ defmodule Exdns.Zone.Parser do
   end
 
   def json_record_to_rr(data) do
-    Logger.debug("Cannot convert #{inspect data}")
+    Logger.debug("Cannot convert #{inspect(data)}")
     {}
   end
-
 
   @doc """
   Builds an index for the given records, where each key is a unique name and 
@@ -165,12 +221,19 @@ defmodule Exdns.Zone.Parser do
   end
 
   defp build_named_index([], index), do: index
-  defp build_named_index([r|rest], index) do
+
+  defp build_named_index([r | rest], index) do
     name = Exdns.Records.dns_rr(r, :name)
+
     case Map.get(index, name) do
-      nil -> build_named_index(rest, Map.put(index, Exdns.Zone.Cache.normalize_name(name), [r]))
-      records -> build_named_index(rest, Map.put(index, Exdns.Zone.Cache.normalize_name(name), records ++ [r]))
+      nil ->
+        build_named_index(rest, Map.put(index, Exdns.Zone.Cache.normalize_name(name), [r]))
+
+      records ->
+        build_named_index(
+          rest,
+          Map.put(index, Exdns.Zone.Cache.normalize_name(name), records ++ [r])
+        )
     end
   end
-
 end

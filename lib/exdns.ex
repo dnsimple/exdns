@@ -20,7 +20,7 @@ defmodule Exdns do
 
   def timestamp() do
     {tm, ts, _} = :os.timestamp()
-    (tm * 1000000) + ts
+    tm * 1_000_000 + ts
   end
 
   defp setup_metrics() do

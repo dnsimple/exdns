@@ -10,7 +10,7 @@ defmodule Exdns.EventsTest do
     end
 
     def handle_cast(message, messages) do
-      {:noreply, [message|messages]}
+      {:noreply, [message | messages]}
     end
 
     def handle_call(:messages, _from, messages) do

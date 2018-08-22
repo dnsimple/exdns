@@ -19,6 +19,7 @@ defmodule Exdns.Events do
     for {_, pid, _, _} <- Supervisor.which_children(__MODULE__) do
       GenServer.stop(pid, :normal, @timeout)
     end
+
     Supervisor.stop(__MODULE__)
   end
 
@@ -26,6 +27,7 @@ defmodule Exdns.Events do
     for {_, pid, _, _} <- Supervisor.which_children(__MODULE__) do
       GenServer.cast(pid, message)
     end
+
     :ok
   end
 
@@ -72,14 +74,14 @@ defmodule Exdns.Events do
   def handle_cast({:refused_response, questions}, state) do
     :folsom_metrics.notify({:refused_response_meter, 1})
     :folsom_metrics.notify({:refused_response_counter, {:inc, 1}})
-    Logger.debug("Refused response: #{inspect questions}")
+    Logger.debug("Refused response: #{inspect(questions)}")
     {:noreply, state}
   end
 
   def handle_cast({:empty_response, message}, state) do
     :folsom_metrics.notify({:empty_response_meter, 1})
     :folsom_metrics.notify({:empty_response_counter, {:inc, 1}})
-    Logger.info("Empty response: #{inspect message}")
+    Logger.info("Empty response: #{inspect(message)}")
     {:noreply, state}
   end
 
