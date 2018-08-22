@@ -4,6 +4,7 @@ defmodule Exdns.Zone.Cache do
   """
 
   use GenServer
+  use Exdns.Constants
   require Exdns.Records
 
   def start_link() do
@@ -86,7 +87,7 @@ defmodule Exdns.Zone.Cache do
   def get_delegations(name) do
     case find_zone_in_cache(name) do
       {:ok, zone} ->
-        Enum.filter(zone.records, fn(r) -> apply(Exdns.Records.match_type(:dns_terms_const.dns_type_ns), [r]) and apply(Exdns.Records.match_delegation(name), [r]) end)
+        Enum.filter(zone.records, fn(r) -> apply(Exdns.Records.match_type(@_DNS_TYPE_NS), [r]) and apply(Exdns.Records.match_delegation(name), [r]) end)
       _ ->
         []
     end

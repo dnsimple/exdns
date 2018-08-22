@@ -6,6 +6,7 @@ defmodule Exdns.QueryThrottle do
   """
 
   use GenServer
+  use Exdns.Constants
   require Exdns.Records
 
   @limit 1
@@ -24,7 +25,7 @@ defmodule Exdns.QueryThrottle do
   def throttle(message, {_, host}) do
     if @enabled do
       questions = Exdns.Records.dns_message(message, :questions)
-      matches = Enum.filter(questions, fn(q) -> Exdns.Records.dns_query(q, :type) == :dns_terms_const.dns_type_any end)
+      matches = Enum.filter(questions, fn(q) -> Exdns.Records.dns_query(q, :type) == @_DNS_TYPE_ANY end)
       case matches do
         [] -> :ok
         _ -> record_request(maybe_throttle(host))

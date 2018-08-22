@@ -6,6 +6,8 @@ defmodule Exdns.Encoder do
   require Logger
   require Exdns.Records
 
+  use Exdns.Constants
+
   def encode_message(message) do
     encode_message(message, [])
   end
@@ -31,7 +33,7 @@ defmodule Exdns.Encoder do
 
   # Private functions
 
-  defp build_error_message({_, message}), do: build_error_message(message, :dns_terms_const.dns_rcode_servfail)
-  defp build_error_message(message), do: build_error_message(message, :dns_terms_const.dns_rcode_servfail)
+  defp build_error_message({_, message}), do: build_error_message(message, @_DNS_RCODE_SERVFAIL)
+  defp build_error_message(message), do: build_error_message(message, @_DNS_RCODE_SERVFAIL)
   defp build_error_message(_message, rcode), do: Exdns.Records.dns_message(rc: rcode)
 end

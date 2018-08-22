@@ -9,6 +9,8 @@ defmodule Exdns.Handler do
   require Record
   require Exdns.Records
 
+  use Exdns.Constants
+
   def handle({:trailing_garbage, message, _}, context) do
     handle(message, context)
   end
@@ -24,7 +26,7 @@ defmodule Exdns.Handler do
   defp handle(message, host, {:throttled, host, _req_count}) do
     :folsom_metrics.notify({:request_throttled_counter, {:inc, 1}})
     :folsom_metrics.notify({:request_throttled_meter, 1})
-    Exdns.Records.dns_message(message, tc: true, aa: true, rc: :dns_terms_const.dns_rcode_noerror)
+    Exdns.Records.dns_message(message, tc: true, aa: true, rc: @_DNS_RCODE_NOERROR)
   end
   defp handle(message, host, _) do
     Logger.debug("Questions: #{inspect Exdns.Records.dns_message(message, :questions)}")
@@ -54,9 +56,9 @@ defmodule Exdns.Handler do
   defp handle_packet_cache_miss(message, [], _host) do
     if Exdns.Config.use_root_hints? do
       {authority, additional} = Exdns.Records.root_hints()
-      Exdns.Records.dns_message(message, aa: false, rc: :dns_terms_const.dns_rcode_refused, authority: authority, additional: additional)
+      Exdns.Records.dns_message(message, aa: false, rc: @_DNS_RCODE_REFUSED, authority: authority, additional: additional)
     else
-      Exdns.Records.dns_message(message, aa: false, rc: :dns_terms_const.dns_rcode_refused)
+      Exdns.Records.dns_message(message, aa: false, rc: @_DNS_RCODE_REFUSED)
     end
   end
   defp handle_packet_cache_miss(message, authority, host) do
@@ -71,7 +73,7 @@ defmodule Exdns.Handler do
       rescue
         _exception ->
           # Logger.error("Error answering request: #{inspect exception}")
-          Exdns.Records.dns_message(message, aa: false, rc: :dns_terms_const.dns_rcode_servfail)
+          Exdns.Records.dns_message(message, aa: false, rc: @_DNS_RCODE_SERVFAIL)
       end
     else
       message = Exdns.Resolver.resolve(message, authority, host)
@@ -107,7 +109,7 @@ defmodule Exdns.Handler do
   defp notify_empty_response(message) do
     rr_count = Exdns.Records.dns_message(message, :anc) + Exdns.Records.dns_message(message, :auc) + Exdns.Records.dns_message(message, :adc)
 
-    dns_rcode_refused = :dns_terms_const.dns_rcode_refused()
+    dns_rcode_refused = @_DNS_RCODE_REFUSED
     case {Exdns.Records.dns_message(message, :rc), rr_count} do
       {^dns_rcode_refused, _} ->
         Exdns.Events.notify({:refused_response, Exdns.Records.dns_message(message, :questions)})

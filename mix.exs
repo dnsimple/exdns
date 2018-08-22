@@ -33,6 +33,7 @@ defmodule Exdns.Mixfile do
       {:folsom, "~> 0.8.7"},
       {:exjsx, "~> 3.2.0"},
       {:dns_erlang, git: "https://github.com/aetrion/dns_erlang.git", app: false},
+      {:quaff, github: "jeanparpaillon/quaff"},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:earmark, ">= 0.0.0", only: :dev}
     ]
