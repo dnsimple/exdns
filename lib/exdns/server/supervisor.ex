@@ -17,8 +17,10 @@ defmodule Exdns.Server.Supervisor do
   end
 
   def stop_children do
-    Supervisor.which_children(Exdns.Server.Supervisor)
-    |> Enum.map(fn c -> Supervisor.terminate_child(Exdns.Server.Supervisor, c) end)
+    _ =
+      Exdns.Server.Supervisor
+      |> Supervisor.which_children()
+      |> Enum.map(fn c -> Supervisor.terminate_child(Exdns.Server.Supervisor, c) end)
 
     :ok
   end
@@ -29,7 +31,9 @@ defmodule Exdns.Server.Supervisor do
     if servers == [] and Mix.env() != :test,
       do: Logger.warn("No servers are specified in your config")
 
-    Enum.map(servers, &define_server/1) |> supervise(strategy: :one_for_one)
+    servers
+    |> Enum.map(&define_server/1)
+    |> supervise(strategy: :one_for_one)
   end
 
   def define_server(%{name: name, type: type, address: raw_ip, port: port, family: family}) do

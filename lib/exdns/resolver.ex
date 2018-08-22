@@ -36,8 +36,10 @@ defmodule Exdns.Resolver do
   # With the qname and qtype in hand, find the nearest zone.
   def resolve(message, authority, qname, qtype, host) do
     zone = Exdns.Zone.Cache.find_zone(qname, authority)
-    message = resolve(message, qname, qtype, zone, host, _cname_chain = [])
-    rewrite_soa_ttl(message) |> additional_processing(host, zone)
+    message
+    |> resolve(qname, qtype, zone, host, _cname_chain = [])
+    |> rewrite_soa_ttl()
+    |> additional_processing(host, zone)
   end
 
   # Step 3: Match records
@@ -240,11 +242,11 @@ defmodule Exdns.Resolver do
 
       _ ->
         # Exact type match for something other than an NS record and the SOA is present
-        Logger.debug(
+        Logger.debug(fn ->
           "Exact type match for something other than NS and SOA is present: #{
             inspect(matched_records)
           }"
-        )
+        end)
 
         answer = List.last(matched_records)
 
@@ -306,9 +308,9 @@ defmodule Exdns.Resolver do
         _authority_records,
         []
       ) do
-    Logger.debug(
+    Logger.debug(fn ->
       "Resolved exact type match and there are no NS records: #{inspect(matched_records)}"
-    )
+    end)
 
     Exdns.Records.dns_message(message,
       aa: true,
@@ -462,7 +464,9 @@ defmodule Exdns.Resolver do
 
     case qtype do
       ^cname_type ->
-        Logger.debug("Qtype is CNAME, returning the CNAME records: #{inspect(cname_records)}")
+        Logger.debug(fn ->
+          "Qtype is CNAME, returning the CNAME records: #{inspect(cname_records)}"
+        end)
 
         Exdns.Records.dns_message(message,
           aa: true,
@@ -475,7 +479,9 @@ defmodule Exdns.Resolver do
           Exdns.Records.dns_message(message, aa: true, rc: @_DNS_RCODE_SERVFAIL)
         else
           name =
-            Exdns.Records.dns_rr(List.last(cname_records), :data)
+            cname_records
+            |> List.last()
+            |> Exdns.Records.dns_rr(:data)
             |> Exdns.Records.dns_rrdata_cname(:dname)
 
           restart_query(
@@ -557,7 +563,8 @@ defmodule Exdns.Resolver do
 
     if Enum.any?(best_match_records, Exdns.Records.match_wildcard()) do
       cname_records =
-        Enum.map(best_match_records, Exdns.Records.replace_name(qname))
+        best_match_records
+        |> Enum.map(Exdns.Records.replace_name(qname))
         |> Enum.filter(Exdns.Records.match_type(@_DNS_TYPE_CNAME))
 
       resolve_best_match_with_wildcard(
@@ -614,7 +621,9 @@ defmodule Exdns.Resolver do
 
     case cname_records do
       [] ->
-        Logger.debug("No CNAME records, checking for type matches in #{inspect(matched_records)}")
+        Logger.debug(fn ->
+          "No CNAME records, checking for type matches in #{inspect(matched_records)}"
+        end)
         records = type_match_records(matched_records, qtype)
         type_matches = Enum.map(records, Exdns.Records.replace_name(qname))
 
@@ -725,9 +734,12 @@ defmodule Exdns.Resolver do
           Exdns.Records.dns_message(message, aa: true, rc: @_DNS_RCODE_SERVFAIL)
         else
           name =
-            Exdns.Records.dns_rr(cname_record, :data) |> Exdns.Records.dns_rrdata_cname(:dname)
+            cname_record
+            |> Exdns.Records.dns_rr(:data)
+            |> Exdns.Records.dns_rrdata_cname(:dname)
 
-          Exdns.Records.dns_message(message,
+          message
+          |> Exdns.Records.dns_message(
             aa: true,
             answers: merge_with_answers(message, cname_records)
           )
@@ -851,7 +863,8 @@ defmodule Exdns.Resolver do
 
   def additional_processing(message, _host, _zone) do
     record_names =
-      merge_with_answers(message, Exdns.Records.dns_message(message, :authority))
+      message
+      |> merge_with_answers(Exdns.Records.dns_message(message, :authority))
       |> requires_additional_processing([])
       |> List.flatten()
 
@@ -861,7 +874,8 @@ defmodule Exdns.Resolver do
 
       _ ->
         records =
-          Enum.map(record_names, fn name -> Exdns.Zone.Cache.get_records_by_name(name) end)
+          record_names
+          |> Enum.map(fn name -> Exdns.Zone.Cache.get_records_by_name(name) end)
           |> List.flatten()
           |> Enum.filter(Exdns.Records.match_types([@_DNS_TYPE_A, @_DNS_TYPE_AAAA]))
 

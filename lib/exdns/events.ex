@@ -74,7 +74,9 @@ defmodule Exdns.Events do
   def handle_cast({:refused_response, questions}, state) do
     :folsom_metrics.notify({:refused_response_meter, 1})
     :folsom_metrics.notify({:refused_response_counter, {:inc, 1}})
-    Logger.debug("Refused response: #{inspect(questions)}")
+    Logger.debug(fn ->
+      "Refused response: #{inspect(questions)}"
+    end)
     {:noreply, state}
   end
 

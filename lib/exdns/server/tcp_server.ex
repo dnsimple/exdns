@@ -7,9 +7,9 @@ defmodule Exdns.Server.TcpServer do
   require Logger
 
   def start_link(_name, inet_family, address, port) do
-    Logger.debug(
+    Logger.debug(fn ->
       "Starting TCP server for #{inet_family} on address #{inspect(address)} port #{port}"
-    )
+    end)
 
     :gen_nb_server.start_link(__MODULE__, address, port, [])
   end

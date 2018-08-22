@@ -32,7 +32,9 @@ defmodule Exdns.Handler do
   end
 
   defp handle(message, host, _) do
-    Logger.debug("Questions: #{inspect(Exdns.Records.dns_message(message, :questions))}")
+    Logger.debug(fn ->
+      "Questions: #{inspect(Exdns.Records.dns_message(message, :questions))}"
+    end)
     Exdns.Events.notify({:start_handle, [{:host, host}, {:message, message}]})
 
     response =
@@ -51,7 +53,9 @@ defmodule Exdns.Handler do
   # This is only public because it is used through Folsom and thus triggers a warning of non-use unless
   # it is public.
   def do_handle(message, host) do
-    handle_message(message, host) |> complete_response
+    message
+    |> handle_message(host)
+    |> complete_response
   end
 
   defp handle_message(message, host) do

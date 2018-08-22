@@ -208,7 +208,9 @@ defmodule Exdns.Zone.Parser do
   end
 
   def json_record_to_rr(data) do
-    Logger.debug("Cannot convert #{inspect(data)}")
+    Logger.debug(fn ->
+      "Cannot convert #{inspect(data)}"
+    end)
     {}
   end
 

@@ -89,8 +89,14 @@ defmodule Exdns.Zone.Cache do
 
   def get_authority(message) do
     case Exdns.Records.dns_message(message, :questions) do
-      [] -> {:error, :no_question}
-      questions -> List.last(questions) |> Exdns.Records.dns_query(:name) |> get_authority()
+      [] ->
+        {:error, :no_question}
+        
+      questions ->
+        questions
+        |> List.last()
+        |> Exdns.Records.dns_query(:name)
+        |> get_authority()
     end
   end
 
