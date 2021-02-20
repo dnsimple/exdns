@@ -39,4 +39,3 @@ defmodule Exdns.Handler.Registry do
     {:reply, :ok, []}
   end
 end
-

@@ -2,10 +2,10 @@ defmodule Exdns.Server.UdpServerTest do
   use ExUnit.Case, async: false
   require Exdns.Records
 
-  @localhost {127,0,0,1}
-  @localhost6 {0,0,0,0,0,0,0,1}
+  @localhost {127, 0, 0, 1}
+  @localhost6 {0, 0, 0, 0, 0, 0, 0, 1}
 
-  test "server start" do 
+  test "server start" do
     assert Exdns.Server.UdpServer.start_link(:test, :inet, @localhost, 12345)
     Exdns.Server.UdpServer.stop(:test)
   end
@@ -22,7 +22,7 @@ defmodule Exdns.Server.UdpServerTest do
   end
 
   test "handle UDP message" do
-    {:ok, server} = Exdns.Server.UdpServer.start_link(:test, :inet, {127,0,0,1}, 12347)
+    {:ok, server} = Exdns.Server.UdpServer.start_link(:test, :inet, {127, 0, 0, 1}, 12347)
     {:ok, socket} = :gen_udp.open(0)
     message = Exdns.Records.dns_message()
     {false, bin} = Exdns.Encoder.encode_message(message)

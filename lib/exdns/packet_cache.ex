@@ -7,7 +7,8 @@ defmodule Exdns.PacketCache do
 
   @enabled true
   @default_ttl 20
-  @sweep_interval 1000 * 60 * 3 # Every 3 minutes
+  # Every 3 minutes
+  @sweep_interval 1000 * 60 * 3
 
   def start_link() do
     GenServer.start_link(__MODULE__, [], name: Exdns.PacketCache)
@@ -27,6 +28,7 @@ defmodule Exdns.PacketCache do
           :folsom_metrics.notify(:cache_hit_meter, 1)
           {:ok, response}
         end
+
       _ ->
         :folsom_metrics.notify(:cache_miss_meter, 1)
         {:error, :cache_miss}
@@ -66,7 +68,11 @@ defmodule Exdns.PacketCache do
   end
 
   def handle_call({:set_packet, [question, response]}, _from, state) do
-    Exdns.Storage.insert(:packet_cache, {question, {response, Exdns.timestamp() + Map.get(state, :ttl)}})
+    Exdns.Storage.insert(
+      :packet_cache,
+      {question, {response, Exdns.timestamp() + Map.get(state, :ttl)}}
+    )
+
     {:reply, :ok, state}
   end
 
@@ -76,8 +82,13 @@ defmodule Exdns.PacketCache do
   end
 
   def handle_call(:sweep, _from, state) do
-    Exdns.Storage.select(:packet_cache, [{{:"$1", {:"_", :"$2"}}, [{:<, :"$2", Exdns.timestamp() - 10}], [:"$1"]}], :infinite) |>
-      Enum.each(fn(k) -> Exdns.Storage.delete(:packet_cache, k) end)
+    Exdns.Storage.select(
+      :packet_cache,
+      [{{:"$1", {:_, :"$2"}}, [{:<, :"$2", Exdns.timestamp() - 10}], [:"$1"]}],
+      :infinite
+    )
+    |> Enum.each(fn k -> Exdns.Storage.delete(:packet_cache, k) end)
+
     {:reply, :ok, state}
   end
 

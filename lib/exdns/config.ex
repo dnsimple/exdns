@@ -16,5 +16,4 @@ defmodule Exdns.Config do
   def servers, do: Application.get_env(:exdns, :servers, [])
 
   def wildcard_fallback?, do: Application.get_env(:exdns, :wildcard_fallback, false)
-
 end

@@ -8,14 +8,14 @@ defmodule Exdns.RecordsTest do
     message = Exdns.Records.dns_message()
     assert Exdns.Records.dns_message(message, :id) != nil
     assert Exdns.Records.dns_message(message, :qr) == false
-    assert Exdns.Records.dns_message(message, :oc) == :dns_terms_const.dns_opcode_query
+    assert Exdns.Records.dns_message(message, :oc) == :dns_terms_const.dns_opcode_query()
     assert Exdns.Records.dns_message(message, :aa) == false
     assert Exdns.Records.dns_message(message, :tc) == false
     assert Exdns.Records.dns_message(message, :rd) == false
     assert Exdns.Records.dns_message(message, :ra) == false
     assert Exdns.Records.dns_message(message, :ad) == false
     assert Exdns.Records.dns_message(message, :cd) == false
-    assert Exdns.Records.dns_message(message, :rc) == :dns_terms_const.dns_rcode_noerror
+    assert Exdns.Records.dns_message(message, :rc) == :dns_terms_const.dns_rcode_noerror()
     assert Exdns.Records.dns_message(message, :qc) == 0
     assert Exdns.Records.dns_message(message, :anc) == 0
     assert Exdns.Records.dns_message(message, :auc) == 0
@@ -146,32 +146,42 @@ defmodule Exdns.RecordsTest do
 
   test "match name" do
     name = "example.com"
-    soa_rr = Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_soa)
-    a_rr = Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_a)
-    cname_rr = Exdns.Records.dns_rr(name: "www.#{name}", type: :dns_terms_const.dns_type_cname)
+    soa_rr = Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_soa())
+    a_rr = Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_a())
+    cname_rr = Exdns.Records.dns_rr(name: "www.#{name}", type: :dns_terms_const.dns_type_cname())
     assert Enum.filter([soa_rr, a_rr, cname_rr], Exdns.Records.match_name(name)) == [soa_rr, a_rr]
   end
 
   test "match type" do
-    soa_rr = Exdns.Records.dns_rr(type: :dns_terms_const.dns_type_soa)
-    a_rr = Exdns.Records.dns_rr(type: :dns_terms_const.dns_type_a)
-    assert Enum.filter([soa_rr, a_rr], Exdns.Records.match_type(:dns_terms_const.dns_type_soa)) == [soa_rr]
+    soa_rr = Exdns.Records.dns_rr(type: :dns_terms_const.dns_type_soa())
+    a_rr = Exdns.Records.dns_rr(type: :dns_terms_const.dns_type_a())
+
+    assert Enum.filter([soa_rr, a_rr], Exdns.Records.match_type(:dns_terms_const.dns_type_soa())) ==
+             [soa_rr]
   end
 
   test "match name and type" do
     name = "example.com"
-    soa_rr = Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_soa)
-    a_rr = Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_a)
-    a_rr2 = Exdns.Records.dns_rr(name: "www.#{name}", type: :dns_terms_const.dns_type_a)
-    assert Enum.filter([soa_rr, a_rr, a_rr2], Exdns.Records.match_name_and_type(name, :dns_terms_const.dns_type_a)) == [a_rr]
+    soa_rr = Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_soa())
+    a_rr = Exdns.Records.dns_rr(name: name, type: :dns_terms_const.dns_type_a())
+    a_rr2 = Exdns.Records.dns_rr(name: "www.#{name}", type: :dns_terms_const.dns_type_a())
+
+    assert Enum.filter(
+             [soa_rr, a_rr, a_rr2],
+             Exdns.Records.match_name_and_type(name, :dns_terms_const.dns_type_a())
+           ) == [a_rr]
   end
 
   test "match types" do
-    soa_rr = Exdns.Records.dns_rr(type: :dns_terms_const.dns_type_soa)
-    a_rr = Exdns.Records.dns_rr(type: :dns_terms_const.dns_type_a)
-    cname_rr = Exdns.Records.dns_rr(type: :dns_terms_const.dns_type_cname)
-    types = [:dns_terms_const.dns_type_a, :dns_terms_const.dns_type_cname]
-    assert Enum.filter([soa_rr, a_rr, cname_rr], Exdns.Records.match_types(types)) == [a_rr, cname_rr]
+    soa_rr = Exdns.Records.dns_rr(type: :dns_terms_const.dns_type_soa())
+    a_rr = Exdns.Records.dns_rr(type: :dns_terms_const.dns_type_a())
+    cname_rr = Exdns.Records.dns_rr(type: :dns_terms_const.dns_type_cname())
+    types = [:dns_terms_const.dns_type_a(), :dns_terms_const.dns_type_cname()]
+
+    assert Enum.filter([soa_rr, a_rr, cname_rr], Exdns.Records.match_types(types)) == [
+             a_rr,
+             cname_rr
+           ]
   end
 
   test "match wildcard" do
@@ -191,7 +201,9 @@ defmodule Exdns.RecordsTest do
 
   test "replace name" do
     rr = Exdns.Records.dns_rr(name: "foo")
-    assert Enum.map([rr], Exdns.Records.replace_name("bar")) == [Exdns.Records.dns_rr(name: "bar")]
-  end
 
+    assert Enum.map([rr], Exdns.Records.replace_name("bar")) == [
+             Exdns.Records.dns_rr(name: "bar")
+           ]
+  end
 end

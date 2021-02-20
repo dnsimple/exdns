@@ -41,7 +41,13 @@ defmodule Exdns.Storage.EtsStorageTest do
 
   test "select match spec from table" do
     Exdns.Storage.EtsStorage.create(:test)
-    assert Exdns.Storage.EtsStorage.select(:test, [{{'$1', '$2'}, [], [{{'$1', '$2'}}]}], :infinite) == []
+
+    assert Exdns.Storage.EtsStorage.select(
+             :test,
+             [{{'$1', '$2'}, [], [{{'$1', '$2'}}]}],
+             :infinite
+           ) == []
+
     Exdns.Storage.EtsStorage.insert(:test, {:key, :value})
     assert Exdns.Storage.EtsStorage.select(:test, :key) == [key: :value]
   end
@@ -50,7 +56,7 @@ defmodule Exdns.Storage.EtsStorageTest do
     Exdns.Storage.EtsStorage.create(:test)
     Exdns.Storage.EtsStorage.insert(:test, {:key1, 1})
     Exdns.Storage.EtsStorage.insert(:test, {:key2, 1})
-    assert Exdns.Storage.EtsStorage.foldl(fn({_key, val}, acc) -> val + acc end, 0, :test) == 2
+    assert Exdns.Storage.EtsStorage.foldl(fn {_key, val}, acc -> val + acc end, 0, :test) == 2
   end
 
   test "empty table" do
@@ -67,4 +73,3 @@ defmodule Exdns.Storage.EtsStorageTest do
     assert Exdns.Storage.EtsStorage.list_table(:test) == [key: :value]
   end
 end
-

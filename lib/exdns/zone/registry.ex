@@ -39,5 +39,3 @@ defmodule Exdns.Zone.Registry do
     {:reply, :ok, []}
   end
 end
-
-

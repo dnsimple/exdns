@@ -37,7 +37,7 @@ defmodule Exdns.PacketCacheTest do
     message = Exdns.Records.dns_message()
     assert Exdns.PacketCache.put(question, message)
     assert Exdns.PacketCache.get(question) == {:ok, message}
-    assert Exdns.PacketCache.clear
+    assert Exdns.PacketCache.clear()
     assert Exdns.PacketCache.get(question) == {:error, :cache_miss}
   end
 end

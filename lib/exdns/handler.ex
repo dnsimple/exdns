@@ -9,12 +9,16 @@ defmodule Exdns.Handler do
   require Record
   require Exdns.Records
 
+  use Exdns.Constants
+
   def handle({:trailing_garbage, message, _}, context) do
     handle(message, context)
   end
+
   def handle(message, context = {_, host}) when Record.is_record(message, :dns_message) do
     handle(message, host, Exdns.QueryThrottle.throttle(message, context))
   end
+
   def handle(bad_message, {_, _host}) do
     bad_message
   end
@@ -24,20 +28,34 @@ defmodule Exdns.Handler do
   defp handle(message, host, {:throttled, host, _req_count}) do
     :folsom_metrics.notify({:request_throttled_counter, {:inc, 1}})
     :folsom_metrics.notify({:request_throttled_meter, 1})
-    Exdns.Records.dns_message(message, tc: true, aa: true, rc: :dns_terms_const.dns_rcode_noerror)
+    Exdns.Records.dns_message(message, tc: true, aa: true, rc: @_DNS_RCODE_NOERROR)
   end
+
   defp handle(message, host, _) do
-    Logger.debug("Questions: #{inspect Exdns.Records.dns_message(message, :questions)}")
+    Logger.debug(fn ->
+      "Questions: #{inspect(Exdns.Records.dns_message(message, :questions))}"
+    end)
     Exdns.Events.notify({:start_handle, [{:host, host}, {:message, message}]})
-    response = :folsom_metrics.histogram_timed_update(:request_handled_histogram, __MODULE__, :do_handle, [message, host])
-    Exdns.Events.notify({:end_handle, [{:host, host}, {:message, message}, {:response, response}]})
+
+    response =
+      :folsom_metrics.histogram_timed_update(:request_handled_histogram, __MODULE__, :do_handle, [
+        message,
+        host
+      ])
+
+    Exdns.Events.notify(
+      {:end_handle, [{:host, host}, {:message, message}, {:response, response}]}
+    )
+
     response
   end
 
   # This is only public because it is used through Folsom and thus triggers a warning of non-use unless
   # it is public.
   def do_handle(message, host) do
-    handle_message(message, host) |> complete_response
+    message
+    |> handle_message(host)
+    |> complete_response
   end
 
   defp handle_message(message, host) do
@@ -45,33 +63,45 @@ defmodule Exdns.Handler do
       {:ok, cached_response} ->
         Exdns.Events.notify({:packet_cache_hit, [{:host, host}, {:message, message}]})
         Exdns.Records.dns_message(cached_response, id: Exdns.Records.dns_message(message, :id))
+
       {:error, reason} ->
-        Exdns.Events.notify({:packet_cache_miss, [{:reason, reason}, {:host, host}, {:message, message}]})
-        handle_packet_cache_miss(message, get_authority(message), host) # SOA lookup
+        Exdns.Events.notify(
+          {:packet_cache_miss, [{:reason, reason}, {:host, host}, {:message, message}]}
+        )
+
+        # SOA lookup
+        handle_packet_cache_miss(message, get_authority(message), host)
     end
   end
 
   defp handle_packet_cache_miss(message, [], _host) do
-    if Exdns.Config.use_root_hints? do
+    if Exdns.Config.use_root_hints?() do
       {authority, additional} = Exdns.Records.root_hints()
-      Exdns.Records.dns_message(message, aa: false, rc: :dns_terms_const.dns_rcode_refused, authority: authority, additional: additional)
+
+      Exdns.Records.dns_message(message,
+        aa: false,
+        rc: @_DNS_RCODE_REFUSED,
+        authority: authority,
+        additional: additional
+      )
     else
-      Exdns.Records.dns_message(message, aa: false, rc: :dns_terms_const.dns_rcode_refused)
+      Exdns.Records.dns_message(message, aa: false, rc: @_DNS_RCODE_REFUSED)
     end
   end
+
   defp handle_packet_cache_miss(message, authority, host) do
     safe_handle_packet_cache_miss(Exdns.Records.dns_message(message, ra: false), authority, host)
   end
 
   defp safe_handle_packet_cache_miss(message, authority, host) do
-    if Exdns.Config.catch_exceptions? do
+    if Exdns.Config.catch_exceptions?() do
       try do
         message = Exdns.Resolver.resolve(message, authority, host)
         maybe_cache_packet(message, Exdns.Records.dns_message(message, :aa))
       rescue
         _exception ->
           # Logger.error("Error answering request: #{inspect exception}")
-          Exdns.Records.dns_message(message, aa: false, rc: :dns_terms_const.dns_rcode_servfail)
+          Exdns.Records.dns_message(message, aa: false, rc: @_DNS_RCODE_SERVFAIL)
       end
     else
       message = Exdns.Resolver.resolve(message, authority, host)
@@ -96,25 +126,32 @@ defmodule Exdns.Handler do
   end
 
   defp complete_response(message) do
-    notify_empty_response(Exdns.Records.dns_message(message,
-      anc: length(Exdns.Records.dns_message(message, :answers)),
-      auc: length(Exdns.Records.dns_message(message, :authority)),
-      adc: length(Exdns.Records.dns_message(message, :additional)),
-      qr: true
-    ))
+    notify_empty_response(
+      Exdns.Records.dns_message(message,
+        anc: length(Exdns.Records.dns_message(message, :answers)),
+        auc: length(Exdns.Records.dns_message(message, :authority)),
+        adc: length(Exdns.Records.dns_message(message, :additional)),
+        qr: true
+      )
+    )
   end
 
   defp notify_empty_response(message) do
-    rr_count = Exdns.Records.dns_message(message, :anc) + Exdns.Records.dns_message(message, :auc) + Exdns.Records.dns_message(message, :adc)
+    rr_count =
+      Exdns.Records.dns_message(message, :anc) + Exdns.Records.dns_message(message, :auc) +
+        Exdns.Records.dns_message(message, :adc)
 
-    dns_rcode_refused = :dns_terms_const.dns_rcode_refused()
+    dns_rcode_refused = @_DNS_RCODE_REFUSED
+
     case {Exdns.Records.dns_message(message, :rc), rr_count} do
       {^dns_rcode_refused, _} ->
         Exdns.Events.notify({:refused_response, Exdns.Records.dns_message(message, :questions)})
         message
+
       {_, 0} ->
         Exdns.Events.notify({:empty_response, message})
         message
+
       _ ->
         message
     end

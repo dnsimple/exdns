@@ -10,26 +10,34 @@ defmodule Exdns.QueryThrottleTest do
   end
 
   test "throttle does not throttle TCP" do
-    assert Exdns.QueryThrottle.throttle(test_message(:dns_terms_const.dns_type_any), {:tcp, @ip}) == :ok
+    assert Exdns.QueryThrottle.throttle(
+             test_message(:dns_terms_const.dns_type_any()),
+             {:tcp, @ip}
+           ) == :ok
+
     Exdns.QueryThrottle.clear()
   end
 
   test "throttle allows 1 UDP ANY queries" do
-    assert Exdns.QueryThrottle.throttle(test_message(:dns_terms_const.dns_type_any), {:udp, @ip}) == {:ok, @ip, 1}
+    assert Exdns.QueryThrottle.throttle(
+             test_message(:dns_terms_const.dns_type_any()),
+             {:udp, @ip}
+           ) == {:ok, @ip, 1}
   end
 
   test "throttle throttles 2 UDP ANY queries" do
-    message = test_message(:dns_terms_const.dns_type_any)
+    message = test_message(:dns_terms_const.dns_type_any())
     assert Exdns.QueryThrottle.throttle(message, {:udp, @ip}) == {:ok, @ip, 1}
     assert Exdns.QueryThrottle.throttle(message, {:udp, @ip}) == {:throttled, @ip, 2}
   end
 
   test "throttle never throttles UDP non-ANY queries" do
-    assert Exdns.QueryThrottle.throttle(test_message(:dns_terms_const.dns_type_a), {:udp, @ip}) == :ok
+    assert Exdns.QueryThrottle.throttle(test_message(:dns_terms_const.dns_type_a()), {:udp, @ip}) ==
+             :ok
   end
 
   test "sweep the throttle" do
-    message = test_message(:dns_terms_const.dns_type_any)
+    message = test_message(:dns_terms_const.dns_type_any())
     Exdns.Storage.insert(:host_throttle, {@ip, {10, Exdns.timestamp()}})
     assert Exdns.QueryThrottle.throttle(message, {:udp, @ip}) == {:throttled, @ip, 11}
     Exdns.Storage.insert(:host_throttle, {@ip, {10, Exdns.timestamp() - 61}})

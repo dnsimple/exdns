@@ -31,4 +31,4 @@ config :exdns, catch_exceptions: true
 #
 #     import_config "#{Mix.env}.exs"
 
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"

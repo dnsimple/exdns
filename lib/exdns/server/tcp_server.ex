@@ -7,12 +7,14 @@ defmodule Exdns.Server.TcpServer do
   require Logger
 
   def start_link(_name, inet_family, address, port) do
-    Logger.debug("Starting TCP server for #{inet_family} on address #{inspect address} port #{port}")
+    Logger.debug(fn ->
+      "Starting TCP server for #{inet_family} on address #{inspect(address)} port #{port}"
+    end)
+
     :gen_nb_server.start_link(__MODULE__, address, port, [])
   end
 
   def stop(_name) do
-
   end
 
   # GenServer callbacks
@@ -30,7 +32,14 @@ defmodule Exdns.Server.TcpServer do
   end
 
   def handle_info(_msg = {:tcp, socket, bin}, state) do
-    _response = :folsom_metrics.histogram_timed_update(:tcp_handoff_histogram, Exdns.Server.TcpServer, :handle_request, [socket, bin, state])
+    _response =
+      :folsom_metrics.histogram_timed_update(
+        :tcp_handoff_histogram,
+        Exdns.Server.TcpServer,
+        :handle_request,
+        [socket, bin, state]
+      )
+
     :inet.setopts(socket, [{:active, :once}])
     {:noreply, state}
   end
@@ -56,7 +65,8 @@ defmodule Exdns.Server.TcpServer do
     case :queue.out(Map.get(state, :workers)) do
       {{:value, worker}, queue} ->
         GenServer.call(worker, {:tcp_query, socket, bin})
-        {:noreply, %{state | workers: :queue.in(worker, queue) }}
+        {:noreply, %{state | workers: :queue.in(worker, queue)}}
+
       {:empty, _queue} ->
         :folsom_metrics.notify({:packet_dropped_empty_queue_counter, {:inc, 1}})
         :folsom_metrics.notify({:packet_dropped_empty_queue_meter, 1})
