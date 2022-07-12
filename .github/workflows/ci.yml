@@ -34,6 +34,7 @@ jobs:
             _build
           key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
 
+      - run: mix deps.get
       - run: mix compile
 
   lint:
@@ -82,6 +83,7 @@ jobs:
             _build
           key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
 
+      - run: mix deps.get
       - run: mix test
       - run: mix dialyzer
 
