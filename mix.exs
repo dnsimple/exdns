@@ -31,7 +31,7 @@ defmodule Exdns.Mixfile do
   defp deps do
     [
       {:folsom, "~> 0.8.3"},
-      {:exjsx, "~> 3.2.0"},
+      {:exjsx, "~> 4.0.0"},
       {:dns_erlang, git: "https://github.com/aetrion/dns_erlang.git", app: false},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:earmark, ">= 0.0.0", only: :dev}
