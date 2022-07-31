@@ -10,11 +10,14 @@ defmodule Exdns.TxtTest do
   end
 
   test "parse long string" do
-    assert Exdns.Txt.parse(String.duplicate("x", 270)) == [String.duplicate("x", 255), String.duplicate("x", 15)]
+    assert Exdns.Txt.parse(String.duplicate("x", 270)) == [
+             String.duplicate("x", 255),
+             String.duplicate("x", 15)
+           ]
   end
 
   test "parse string with escaped quotes" do
-    assert Exdns.Txt.parse("\"test\" \"test\"") == ["test","test"]
+    assert Exdns.Txt.parse("\"test\" \"test\"") == ["test", "test"]
   end
 
   test "parse escape character by itself" do

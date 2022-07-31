@@ -4,7 +4,7 @@ defmodule Exdns.EdnsTest do
   use ExUnit.Case, async: true
 
   test "get opts when records are present" do
-    message = Exdns.Records.dns_message
+    message = Exdns.Records.dns_message()
     assert Exdns.Edns.get_opts(message) == []
   end
 

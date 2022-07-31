@@ -6,6 +6,7 @@ defmodule Exdns.QueryThrottle do
   """
 
   use GenServer
+  use Exdns.Constants
   require Exdns.Records
 
   @limit 1
@@ -24,7 +25,10 @@ defmodule Exdns.QueryThrottle do
   def throttle(message, {_, host}) do
     if @enabled do
       questions = Exdns.Records.dns_message(message, :questions)
-      matches = Enum.filter(questions, fn(q) -> Exdns.Records.dns_query(q, :type) == :dns_terms_const.dns_type_any end)
+
+      matches =
+        Enum.filter(questions, fn q -> Exdns.Records.dns_query(q, :type) == @_DNS_TYPE_ANY end)
+
       case matches do
         [] -> :ok
         _ -> record_request(maybe_throttle(host))
@@ -53,15 +57,23 @@ defmodule Exdns.QueryThrottle do
     {:ok, tref} = :timer.apply_interval(@sweep_interval, Exdns.QueryThrottle, :sweep, [])
     {:ok, %{tref: tref}}
   end
+
   def handle_call(:clear, _from, state) do
     Exdns.Storage.empty_table(:host_throttle)
     {:reply, :ok, state}
   end
+
   def handle_call(:sweep, _from, state) do
-    Exdns.Storage.select(:host_throttle, [{{:"$1", {:"_", :"$2"}}, [{:<, :"$2", Exdns.timestamp() - @expiration}], [:"$1"]}], :infinite) |>
-      Enum.each(fn(k) -> Exdns.Storage.delete(:host_throttle, k) end)
+    Exdns.Storage.select(
+      :host_throttle,
+      [{{:"$1", {:_, :"$2"}}, [{:<, :"$2", Exdns.timestamp() - @expiration}], [:"$1"]}],
+      :infinite
+    )
+    |> Enum.each(fn k -> Exdns.Storage.delete(:host_throttle, k) end)
+
     {:reply, :ok, state}
   end
+
   def handle_call(:stop, _from, state) do
     {:stop, :normal, :ok, state}
   end
@@ -75,6 +87,7 @@ defmodule Exdns.QueryThrottle do
           {true, new_req_count} -> {:throttled, host, new_req_count}
           {false, new_req_count} -> {:ok, host, new_req_count}
         end
+
       [] ->
         {:ok, host, 1}
     end
@@ -88,9 +101,11 @@ defmodule Exdns.QueryThrottle do
   defp is_throttled({127, 0, 0, 1}, req_count, _) do
     {false, req_count + 1}
   end
+
   defp is_throttled(host, req_count, last_request_at) do
     exceeds_limit = req_count >= @limit
     expired = Exdns.timestamp() - last_request_at > @expiration
+
     if expired do
       Exdns.Storage.delete(:host_throttle, host)
       {false, 1}

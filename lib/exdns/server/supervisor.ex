@@ -17,21 +17,32 @@ defmodule Exdns.Server.Supervisor do
   end
 
   def stop_children do
-    Supervisor.which_children(Exdns.Server.Supervisor) |>
-      Enum.map(fn(c) -> Supervisor.terminate_child(Exdns.Server.Supervisor, c) end)
+    _ =
+      Exdns.Server.Supervisor
+      |> Supervisor.which_children()
+      |> Enum.map(fn c -> Supervisor.terminate_child(Exdns.Server.Supervisor, c) end)
+
     :ok
   end
 
   def init(_) do
-    servers = Exdns.Config.servers
-    if servers == [] and Mix.env != :test, do: Logger.warn("No servers are specified in your config")
-    Enum.map(servers, &define_server/1) |> supervise(strategy: :one_for_one)
+    servers = Exdns.Config.servers()
+
+    if servers == [] and Mix.env() != :test,
+      do: Logger.warn("No servers are specified in your config")
+
+    servers
+    |> Enum.map(&define_server/1)
+    |> supervise(strategy: :one_for_one)
   end
 
   def define_server(%{name: name, type: type, address: raw_ip, port: port, family: family}) do
-    case :inet_parse.address(to_char_list(raw_ip)) do
-      {:ok, address} -> worker(type, [name, family, address, port], id: name, restart: :permanent, timeout: 5000)
-      {:error, reason} -> raise ArgumentError, reason
+    case :inet_parse.address(to_charlist(raw_ip)) do
+      {:ok, address} ->
+        worker(type, [name, family, address, port], id: name, restart: :permanent, timeout: 5000)
+
+      {:error, reason} ->
+        raise ArgumentError, reason
     end
   end
 end

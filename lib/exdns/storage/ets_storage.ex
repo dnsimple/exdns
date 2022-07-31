@@ -38,10 +38,11 @@ defmodule Exdns.Storage.EtsStorage do
     :ets.lookup(table, key)
   end
 
-  @spec select(atom(), list(), :infinite | integer()) :: tuple() | :ets.'$end_of_table'
+  @spec select(atom(), list(), :infinite | integer()) :: tuple() | :ets."$end_of_table"()
   def select(table, match_spec, :infinite) do
     :ets.select(table, match_spec)
   end
+
   def select(table, match_spec, limit) do
     :ets.select(table, match_spec, limit)
   end
@@ -58,7 +59,7 @@ defmodule Exdns.Storage.EtsStorage do
 
   @spec list_table(atom()) :: term()
   def list_table(table) do
-   :ets.tab2list(table)
+    :ets.tab2list(table)
   end
 
   # Private functions
@@ -70,6 +71,7 @@ defmodule Exdns.Storage.EtsStorage do
           ^name -> :ok
           error -> {:error, error}
         end
+
       _info_list ->
         :ok
     end

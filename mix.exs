@@ -2,14 +2,17 @@ defmodule Exdns.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :exdns,
-     version: "0.0.2",
-     elixir: "~> 1.2",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     description: description(),
-     package: package(),
-     deps: deps()]
+    [
+      app: :exdns,
+      version: "0.0.2",
+      elixir: "~> 1.2",
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      description: description(),
+      package: package(),
+      deps: deps(),
+      aliases: aliases(Mix.env())
+    ]
   end
 
   # Configuration for the OTP application
@@ -17,6 +20,14 @@ defmodule Exdns.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [applications: [:logger, :folsom], mod: {Exdns, []}, start_phases: [{:post_start, []}]]
+  end
+
+  defp aliases(:prod), do: []
+
+  defp aliases(_) do
+    [
+      compile: ["format", "compile"]
+    ]
   end
 
   # Dependencies can be Hex packages:
@@ -30,11 +41,15 @@ defmodule Exdns.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:folsom, "~> 0.8.3"},
+      {:folsom, "~> 0.8.7"},
       {:exjsx, "~> 3.2.0"},
       {:dns_erlang, git: "https://github.com/aetrion/dns_erlang.git", app: false},
+      {:quaff, github: "jeanparpaillon/quaff"},
       {:ex_doc, ">= 0.0.0", only: :dev},
-      {:earmark, ">= 0.0.0", only: :dev}
+      {:earmark, ">= 0.0.0", only: :dev},
+      # Dev and test
+      {:credo, "~> 0.9", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0.0-rc.2", only: [:dev, :test], runtime: false}
     ]
   end
 

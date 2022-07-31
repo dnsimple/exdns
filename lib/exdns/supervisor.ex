@@ -11,7 +11,7 @@ defmodule Exdns.Supervisor do
 
   def init(_args) do
     children = [
-      worker(Exdns.Events, []),
+      supervisor(Exdns.Events, []),
       worker(Exdns.Zone.Cache, []),
       worker(Exdns.Zone.Registry, []),
       # worker(Exdns.ZoneEncoder, []),
@@ -22,5 +22,4 @@ defmodule Exdns.Supervisor do
 
     supervise(children, strategy: :one_for_one)
   end
-
 end
