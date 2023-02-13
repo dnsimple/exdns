@@ -1,9 +1,10 @@
 %{"asn1ex": {:git, "https://github.com/T0ha/asn1ex.git", "44a63145ee840afb1a1236a12807422cbd286502", [branch: "master"]},
   "base32": {:git, "https://github.com/aetrion/base32_erlang.git", "40431a7480176b24863e18b92d9872e54c714df5", [branch: :master]},
-  "bear": {:hex, :bear, "0.8.3", "866002127a97932720a0d475d8582c98ec5fb78db3a18dfe7eaf91594d9024b8", [:rebar3], []},
+  "bear": {:hex, :bear, "0.8.3", "866002127a97932720a0d475d8582c98ec5fb78db3a18dfe7eaf91594d9024b8", [:rebar3], [], "hexpm", "0a04ce4702e00e0a43c0fcdd63e38c9c7d64dceb32b27ffed261709e7c3861ad"},
   "dns_erlang": {:git, "https://github.com/aetrion/dns_erlang.git", "27c84be07561f8f3c00b9ffacd0b4f2d8003cd86", []},
-  "earmark": {:hex, :earmark, "1.2.0", "bf1ce17aea43ab62f6943b97bd6e3dc032ce45d4f787504e3adf738e54b42f3a", [:mix], []},
-  "ex_doc": {:hex, :ex_doc, "0.15.0", "e73333785eef3488cf9144a6e847d3d647e67d02bd6fdac500687854dd5c599f", [:mix], [{:earmark, "~> 1.1", [hex: :earmark, optional: false]}]},
-  "exjsx": {:hex, :exjsx, "3.2.1", "1bc5bf1e4fd249104178f0885030bcd75a4526f4d2a1e976f4b428d347614f0f", [:mix], [{:jsx, "~> 2.8.0", [hex: :jsx, optional: false]}]},
-  "folsom": {:hex, :folsom, "0.8.3", "71cff146152fa95e6092e62119f9dc96888660111e7b61853c8fdcf80598a4e0", [:rebar3], [{:bear, "0.8.3", [hex: :bear, optional: false]}]},
-  "jsx": {:hex, :jsx, "2.8.2", "7acc7d785b5abe8a6e9adbde926a24e481f29956dd8b4df49e3e4e7bcc92a018", [:mix, :rebar3], []}}
+  "earmark": {:hex, :earmark, "1.4.36", "e8d057edc0c762ddd7928502f33d1c98705338963e3f9200af4ca8379994779c", [:mix], [{:earmark_parser, "~> 1.4.30", [hex: :earmark_parser, repo: "hexpm", optional: false]}], "hexpm", "a71f2457c8ac1877b0af43a1093fc57f7cc387015eb503306ce83771f50cb74d"},
+  "earmark_parser": {:hex, :earmark_parser, "1.4.30", "0b938aa5b9bafd455056440cdaa2a79197ca5e693830b4a982beada840513c5f", [:mix], [], "hexpm", "3b5385c2d36b0473d0b206927b841343d25adb14f95f0110062506b300cd5a1b"},
+  "ex_doc": {:hex, :ex_doc, "0.15.0", "e73333785eef3488cf9144a6e847d3d647e67d02bd6fdac500687854dd5c599f", [:mix], [{:earmark, "~> 1.1", [hex: :earmark, repo: "hexpm", optional: false]}], "hexpm", "e5ea59f50ecdfe4cc755808450dafe35221d5a0f4a31c42e80a7188eca570e4c"},
+  "exjsx": {:hex, :exjsx, "3.2.1", "1bc5bf1e4fd249104178f0885030bcd75a4526f4d2a1e976f4b428d347614f0f", [:mix], [{:jsx, "~> 2.8.0", [hex: :jsx, repo: "hexpm", optional: false]}], "hexpm", "b55727b206dab96feb025267e5c122ddb448f55b6648f9156b8d481215d80290"},
+  "folsom": {:hex, :folsom, "0.8.3", "71cff146152fa95e6092e62119f9dc96888660111e7b61853c8fdcf80598a4e0", [:rebar3], [{:bear, "0.8.3", [hex: :bear, repo: "hexpm", optional: false]}], "hexpm", "afaa1ea4cd2a10a32242ac5d76fa7b17e98d202883859136b791d9a383b26820"},
+  "jsx": {:hex, :jsx, "2.8.2", "7acc7d785b5abe8a6e9adbde926a24e481f29956dd8b4df49e3e4e7bcc92a018", [:mix, :rebar3], [], "hexpm", "b4c5d3230b397c8d95579e4a3d72826bb6463160130ccf4182f5be8579b5f44c"}}
